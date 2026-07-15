@@ -60,6 +60,9 @@ export class User implements IUser {
   @Prop({ type: PrivacySettingsSchema, default: () => ({ hideProfile: false, hideLevel: false }) })
   privacySettings: PrivacySettings;
 
+  @Prop({ type: Boolean, default: false })
+  isEmailVerified: boolean;
+
   @Prop({ type: Number, default: 0 })
   sessionsJoined: number;
 

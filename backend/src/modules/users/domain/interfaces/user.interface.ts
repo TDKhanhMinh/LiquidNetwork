@@ -23,6 +23,8 @@ export interface IUser {
   alcoholToleranceLevel: AlcoholToleranceLevel;
   privacySettings: IPrivacySettings;
   
+  isEmailVerified: boolean;
+  
   sessionsJoined: number;
   invitationAcceptRate: number; // percentage (0-100)
   averageRating: number;

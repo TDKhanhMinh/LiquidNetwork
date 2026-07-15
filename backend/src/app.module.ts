@@ -12,7 +12,7 @@ import { QueueModule } from './shared/queue/queue.module';
 import { RateLimiterModule } from './shared/rate-limiter/throttler.module';
 
 // Feature modules (sẽ thêm sau)
-// import { AuthModule } from './modules/auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 // import { DrinkingSessionsModule } from './modules/drinking-sessions/drinking-sessions.module';
 
 @Module({
@@ -24,7 +24,7 @@ import { RateLimiterModule } from './shared/rate-limiter/throttler.module';
     RateLimiterModule,
 
     // Feature Modules
-    // AuthModule,
+    AuthModule,
     // DrinkingSessionsModule,
   ],
   controllers: [AppController],
