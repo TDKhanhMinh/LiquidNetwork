@@ -58,6 +58,10 @@ export class EnvironmentVariables {
   @IsNumber()
   @IsOptional()
   THROTTLE_LIMIT?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  GOOGLE_AUTH_ENABLED?: boolean;
 }
 
 /**
@@ -65,11 +69,9 @@ export class EnvironmentVariables {
  * Sử dụng class-validator và class-transformer để validate
  */
 export function validate(config: Record<string, unknown>) {
-  const validatedConfig = plainToInstance(
-    EnvironmentVariables,
-    config,
-    { enableImplicitConversion: true },
-  );
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
 
   const errors = validateSync(validatedConfig, { skipMissingProperties: false });
 

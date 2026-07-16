@@ -27,6 +27,9 @@ export interface AppConfig {
     ttl: number;
     limit: number;
   };
+  auth: {
+    googleEnabled: boolean;
+  };
 }
 
 /**
@@ -46,16 +49,19 @@ export default (): AppConfig => ({
   },
   jwt: {
     secret: process.env.JWT_SECRET || '',
-    expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+    expiresIn: process.env.JWT_EXPIRES_IN || '15m',
   },
   cors: {
     origin: process.env.CORS_ORIGIN || '*',
   },
   swagger: {
-    enabled: process.env.ENABLE_SWAGGER === 'true',
+    enabled: process.env.ENABLE_SWAGGER !== 'false',
   },
   throttler: {
     ttl: parseInt(process.env.THROTTLE_TTL || '60', 10),
     limit: parseInt(process.env.THROTTLE_LIMIT || '100', 10),
+  },
+  auth: {
+    googleEnabled: process.env.GOOGLE_AUTH_ENABLED === 'true',
   },
 });

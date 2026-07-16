@@ -3,6 +3,7 @@ import type { IUserRepository } from '../../domain/repositories/user.repository.
 import { UpdateUserCommand } from '../dto/user.command';
 import { IUser } from '../../domain/interfaces/user.interface';
 import { FindUserByIdUseCase } from './find-user-by-id.use-case';
+import { NotFoundException } from '../../../../shared/common/exceptions/not-found.exception';
 
 @Injectable()
 export class UpdateBasicInfoUseCase {
@@ -13,8 +14,11 @@ export class UpdateBasicInfoUseCase {
   ) {}
 
   async execute(id: string, command: UpdateUserCommand): Promise<IUser> {
-    const user = await this.findUserByIdUseCase.execute(id);
+    await this.findUserByIdUseCase.execute(id);
     const updated = await this.userRepository.updateById(id, command);
-    return updated!;
+    if (!updated) {
+      throw new NotFoundException('User not found', 'USER_NOT_FOUND');
+    }
+    return updated;
   }
 }

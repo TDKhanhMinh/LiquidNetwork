@@ -1,17 +1,21 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import type { IUserRepository } from '../../../users/domain/repositories/user.repository.interface';
 import type { IAuthAccountRepository } from '../../domain/repositories/auth-account.repository.interface';
 import type { IPasswordService } from '../../domain/services/password.service.interface';
 import { IRegisterInput } from '../dto/register.input';
-import { ConflictException } from '../../../../shared/common/exceptions/conflict.exception';
 import type { ITokenService } from '../../domain/services/token.service.interface';
 import type { IRefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.interface';
+import { DatabaseException } from '../../../../shared/common/exceptions/database.exception';
+import { CreateUserUseCase } from '../../../users/application/use-cases/create-user.use-case';
 
 @Injectable()
 export class RegisterUseCase {
+  private readonly logger = new Logger(RegisterUseCase.name);
+
   constructor(
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
+    private readonly createUserUseCase: CreateUserUseCase,
     @Inject('IAuthAccountRepository')
     private readonly authAccountRepository: IAuthAccountRepository,
     @Inject('IRefreshTokenRepository')
@@ -23,35 +27,57 @@ export class RegisterUseCase {
   ) {}
 
   async execute(input: IRegisterInput) {
-    // 1. Check if email exists in Users collection
-    const existingUser = await this.userRepository.findOne({ email: input.email });
-    if (existingUser) {
-      throw new ConflictException('Email already in use', 'EMAIL_ALREADY_EXISTS');
-    }
-
-    const user = await this.userRepository.create({
+    // Email uniqueness + default profile fields live in CreateUserUseCase
+    const user = await this.createUserUseCase.execute({
       email: input.email,
       name: input.name,
       isEmailVerified: false,
     });
 
-    // 3. Hash password
-    const hashedPassword = await this.passwordService.hashPassword(input.password);
+    const userId = (user as any)._id?.toString?.() ?? (user as any)._id;
 
-    await this.authAccountRepository.create({
-      userId: user._id,
-      password: hashedPassword,
+    try {
+      const hashedPassword = await this.passwordService.hashPassword(
+        input.password,
+      );
+
+      await this.authAccountRepository.create({
+        userId: (user as any)._id,
+        password: hashedPassword,
+      });
+    } catch (error) {
+      // Compensate: avoid orphan users without auth credentials
+      this.logger.error(
+        `Auth account creation failed for user ${userId}; compensating with hard delete`,
+        error instanceof Error ? error.stack : undefined,
+      );
+      try {
+        await this.userRepository.deleteById(userId, false);
+      } catch (cleanupError) {
+        this.logger.error(
+          `Failed to hard-delete orphan user ${userId}`,
+          cleanupError instanceof Error ? cleanupError.stack : undefined,
+        );
+      }
+      throw new DatabaseException(
+        'Failed to complete registration. Please try again.',
+        'REGISTRATION_FAILED',
+      );
+    }
+
+    const accessToken = this.tokenService.generateAccessToken({
+      sub: userId,
+      email: user.email,
     });
-
-    const accessToken = this.tokenService.generateAccessToken({ sub: user._id, email: user.email });
-    const refreshTokenString = this.tokenService.generateRefreshToken(user._id as string);
-    const hashedRefreshToken = await this.tokenService.hashRefreshToken(refreshTokenString);
+    const refreshTokenString = this.tokenService.generateRefreshToken(userId);
+    const hashedRefreshToken =
+      await this.tokenService.hashRefreshToken(refreshTokenString);
 
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
     await this.refreshTokenRepository.create({
-      userId: user._id,
+      userId: (user as any)._id,
       token: hashedRefreshToken,
       expiresAt,
       isRevoked: false,
@@ -59,7 +85,7 @@ export class RegisterUseCase {
 
     return {
       user: {
-        id: user._id,
+        id: userId,
         name: user.name,
         email: user.email,
       },

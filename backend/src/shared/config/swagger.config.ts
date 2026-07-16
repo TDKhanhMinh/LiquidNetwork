@@ -1,21 +1,29 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppConfig } from './configuration';
 
-export function setupSwagger(app: INestApplication, configService: ConfigService): void {
-  const env = configService.get<string>('NODE_ENV') || 'development';
-  const enableSwagger = configService.get<string>('ENABLE_SWAGGER') === 'true';
+export function setupSwagger(
+  app: INestApplication,
+  configService: ConfigService<AppConfig, true>,
+): void {
+  const env = configService.get('env', { infer: true }) || 'development';
+  const swaggerEnabled = configService.get('swagger.enabled', { infer: true }) !== false;
 
-  // Only enable Swagger in development environment or when explicitly allowed
-  if (env !== 'development' && !enableSwagger) {
+  // Only enable Swagger in development or when explicitly allowed via ENABLE_SWAGGER
+  if (env !== 'development' && !swaggerEnabled) {
+    return;
+  }
+
+  if (env === 'development' && process.env.ENABLE_SWAGGER === 'false') {
     return;
   }
 
   const options = new DocumentBuilder()
-    .setTitle('DrunkSocial API')
-    .setDescription('Backend API for DrunkSocial - Vietnamese Drinking Social Super App')
+    .setTitle('LiquidNetwork API')
+    .setDescription('Backend API for LiquidNetwork')
     .setVersion('1.0')
-    .setContact('DrunkSocial Team', 'https://drunksocial.com', 'support@drunksocial.com')
+    .setContact('LiquidNetwork Team', 'https://liquidnetwork.app', 'support@liquidnetwork.app')
     .addBearerAuth(
       {
         type: 'http',
@@ -25,18 +33,18 @@ export function setupSwagger(app: INestApplication, configService: ConfigService
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth' // Use this name in @ApiBearerAuth('JWT-auth')
+      'JWT-auth',
     )
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  
+
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
       tagsSorter: 'alpha',
       operationsSorter: 'alpha',
     },
-    customSiteTitle: 'DrunkSocial API Documentation',
+    customSiteTitle: 'LiquidNetwork API Documentation',
   });
 }

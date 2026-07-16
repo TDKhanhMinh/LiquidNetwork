@@ -13,13 +13,23 @@ export class CreateUserUseCase {
   ) {}
 
   async execute(command: CreateUserCommand): Promise<IUser> {
-    const existingUser = await this.userRepository.findOne({ email: command.email });
+    const existingUser = await this.userRepository.findOne({
+      email: command.email,
+    });
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      throw new ConflictException(
+        'Email already in use',
+        'EMAIL_ALREADY_EXISTS',
+      );
     }
 
     const newUser = {
-      ...command,
+      name: command.name,
+      email: command.email,
+      phone: command.phone,
+      avatar: command.avatar,
+      bio: command.bio,
+      isEmailVerified: command.isEmailVerified ?? false,
       drunkProfile: {},
       alcoholToleranceLevel: AlcoholToleranceLevel.LEVEL_1,
       privacySettings: {

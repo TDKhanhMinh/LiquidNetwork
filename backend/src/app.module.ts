@@ -1,19 +1,16 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-
 import { AppConfigModule } from './shared/config/app-config.module';
-
 import { MongooseModule } from './shared/database/mongoose/mongoose.module';
-
 import { QueueModule } from './shared/queue/queue.module';
-
 import { RateLimiterModule } from './shared/rate-limiter/throttler.module';
+import { ResponseInterceptor } from './shared/common/interceptors/response.interceptor';
 
-// Feature modules (sẽ thêm sau)
 import { AuthModule } from './modules/auth/auth.module';
-// import { DrinkingSessionsModule } from './modules/drinking-sessions/drinking-sessions.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -25,9 +22,15 @@ import { AuthModule } from './modules/auth/auth.module';
 
     // Feature Modules
     AuthModule,
-    // DrinkingSessionsModule,
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
 })
 export class AppModule {}

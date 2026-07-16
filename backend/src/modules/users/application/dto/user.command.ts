@@ -17,6 +17,7 @@ export interface CreateUserCommand {
   phone?: string;
   avatar?: string;
   bio?: string;
+  isEmailVerified?: boolean;
 }
 
 export interface UpdateUserCommand {

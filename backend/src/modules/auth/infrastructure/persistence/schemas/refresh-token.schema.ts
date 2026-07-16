@@ -32,3 +32,6 @@ export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);
 
 // Auto-delete expired tokens
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+// Speed up refresh/logout lookups per user
+RefreshTokenSchema.index({ userId: 1, isRevoked: 1 });

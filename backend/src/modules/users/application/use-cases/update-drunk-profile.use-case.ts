@@ -3,6 +3,7 @@ import type { IUserRepository } from '../../domain/repositories/user.repository.
 import { UpdateDrunkProfileCommand } from '../dto/user.command';
 import { IUser } from '../../domain/interfaces/user.interface';
 import { FindUserByIdUseCase } from './find-user-by-id.use-case';
+import { NotFoundException } from '../../../../shared/common/exceptions/not-found.exception';
 
 @Injectable()
 export class UpdateDrunkProfileUseCase {
@@ -18,7 +19,12 @@ export class UpdateDrunkProfileUseCase {
       ...user.drunkProfile,
       ...command.drunkProfile,
     };
-    const updated = await this.userRepository.updateById(id, { drunkProfile: updatedDrunkProfile });
-    return updated!;
+    const updated = await this.userRepository.updateById(id, {
+      drunkProfile: updatedDrunkProfile,
+    });
+    if (!updated) {
+      throw new NotFoundException('User not found', 'USER_NOT_FOUND');
+    }
+    return updated;
   }
 }

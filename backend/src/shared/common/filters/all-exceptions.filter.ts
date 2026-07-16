@@ -1,4 +1,13 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Optional,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { DomainException } from '../exceptions';
 import { ExceptionResponse } from './exception-response.interface';
@@ -7,11 +16,13 @@ import { ExceptionResponse } from './exception-response.interface';
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
+  constructor(@Optional() private readonly configService?: ConfigService) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    
+
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let code = 'INTERNAL_SERVER_ERROR';
     let message = 'An unexpected error occurred';
@@ -25,10 +36,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const responseBody = exception.getResponse();
-      
+
       if (typeof responseBody === 'object' && responseBody !== null) {
-        code = (responseBody as any).error?.replace(/\s+/g, '_').toUpperCase() || 'HTTP_EXCEPTION';
-        
+        code =
+          (responseBody as any).error?.replace(/\s+/g, '_').toUpperCase() ||
+          'HTTP_EXCEPTION';
+
         const resMessage = (responseBody as any).message;
         if (Array.isArray(resMessage)) {
           details = { errors: resMessage };
@@ -42,7 +55,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = exception.message;
       }
     } else if (exception instanceof Error) {
-      // Mongoose and BullMQ errors
       if (exception.name === 'ValidationError') {
         status = HttpStatus.BAD_REQUEST;
         code = 'VALIDATION_ERROR';
@@ -63,7 +75,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
           code = 'DATABASE_ERROR';
           message = exception.message;
         }
-      } else if (exception.name.toLowerCase().includes('bull') || exception.message.toLowerCase().includes('bullmq') || exception.name === 'WaitingChildrenError') {
+      } else if (
+        exception.name.toLowerCase().includes('bull') ||
+        exception.message.toLowerCase().includes('bullmq') ||
+        exception.name === 'WaitingChildrenError'
+      ) {
         status = HttpStatus.INTERNAL_SERVER_ERROR;
         code = 'QUEUE_ERROR';
         message = exception.message;
@@ -72,11 +88,29 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
     }
 
-    // Log the error
+    // Log the error (always keep full detail server-side)
     if (status >= 500) {
-      this.logger.error(`[${request.method}] ${request.url} - ${message}`, exception instanceof Error ? exception.stack : 'Unknown stack');
+      this.logger.error(
+        `[${request.method}] ${request.url} - ${message}`,
+        exception instanceof Error ? exception.stack : 'Unknown stack',
+      );
     } else {
       this.logger.warn(`[${request.method}] ${request.url} - ${message}`);
+    }
+
+    // Never leak internal error details to clients in production
+    const env =
+      (this.configService?.get('env') as string | undefined) ||
+      process.env.NODE_ENV ||
+      'development';
+    const isProduction = env === 'production';
+
+    if (isProduction && status >= 500) {
+      message = 'An unexpected error occurred';
+      details = undefined;
+      if (code === 'DATABASE_ERROR' || code === 'QUEUE_ERROR') {
+        code = 'INTERNAL_SERVER_ERROR';
+      }
     }
 
     const errorResponse: ExceptionResponse = {

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 
 import { AuthController } from './presentation/http/auth.controller';
 import { AuthService } from './application/services/auth.service';
@@ -14,16 +15,24 @@ import { PasswordService } from './infrastructure/services/password.service';
 import { TokenService } from './infrastructure/services/token.service';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 
-import { RefreshToken, RefreshTokenSchema } from './infrastructure/persistence/schemas/refresh-token.schema';
-import { AuthAccount, AuthAccountSchema } from './infrastructure/persistence/schemas/auth-account.schema';
+import {
+  RefreshToken,
+  RefreshTokenSchema,
+} from './infrastructure/persistence/schemas/refresh-token.schema';
+import {
+  AuthAccount,
+  AuthAccountSchema,
+} from './infrastructure/persistence/schemas/auth-account.schema';
 import { RefreshTokenMongooseRepository } from './infrastructure/persistence/repositories/refresh-token.mongoose.repository';
 import { AuthAccountMongooseRepository } from './infrastructure/persistence/repositories/auth-account.mongoose.repository';
 
 import { UsersModule } from '../users/users.module';
+import { AppConfig } from '../../shared/config/configuration';
 
 @Module({
   imports: [
     UsersModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     MongooseModule.forFeature([
       { name: RefreshToken.name, schema: RefreshTokenSchema },
       { name: AuthAccount.name, schema: AuthAccountSchema },
@@ -31,10 +40,13 @@ import { UsersModule } from '../users/users.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService): JwtModuleOptions => ({
-        secret: configService.get<string>('JWT_SECRET') as string,
+      useFactory: (
+        configService: ConfigService<AppConfig, true>,
+      ): JwtModuleOptions => ({
+        secret: configService.get('jwt.secret', { infer: true }) || '',
         signOptions: {
-          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '15m') as any,
+          expiresIn: (configService.get('jwt.expiresIn', { infer: true }) ||
+            '15m') as any,
         },
       }),
     }),
@@ -65,6 +77,6 @@ import { UsersModule } from '../users/users.module';
       useClass: AuthAccountMongooseRepository,
     },
   ],
-  exports: [AuthService, JwtStrategy],
+  exports: [AuthService, JwtStrategy, PassportModule],
 })
 export class AuthModule {}

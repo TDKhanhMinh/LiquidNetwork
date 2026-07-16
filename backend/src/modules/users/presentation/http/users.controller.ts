@@ -1,5 +1,11 @@
-import { Body, Controller, Get, Param, Patch, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FindUserByIdUseCase } from '../../application/use-cases/find-user-by-id.use-case';
+import { GetUserProfileUseCase } from '../../application/use-cases/get-user-profile.use-case';
 import { UpdateBasicInfoUseCase } from '../../application/use-cases/update-basic-info.use-case';
 import { UpdateDrunkProfileUseCase } from '../../application/use-cases/update-drunk-profile.use-case';
 import { UpdatePrivacySettingsUseCase } from '../../application/use-cases/update-privacy-settings.use-case';
@@ -8,17 +14,21 @@ import {
   UpdateDrunkProfileDto,
   UpdatePrivacySettingsDto,
   UpdateToleranceLevelDto,
-  UpdateUserDto
+  UpdateUserDto,
 } from '../dtos/user-request.dto';
 import { UserResponseDto } from '../dtos/user-response.dto';
 
 import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard';
+import { CurrentUser } from '../../../auth/presentation/decorators/current-user.decorator';
 
+@ApiTags('Users')
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(
     private readonly findUserByIdUseCase: FindUserByIdUseCase,
+    private readonly getUserProfileUseCase: GetUserProfileUseCase,
     private readonly updateBasicInfoUseCase: UpdateBasicInfoUseCase,
     private readonly updateDrunkProfileUseCase: UpdateDrunkProfileUseCase,
     private readonly updatePrivacySettingsUseCase: UpdatePrivacySettingsUseCase,
@@ -26,44 +36,66 @@ export class UsersController {
   ) {}
 
   @Get('me')
-  async getMyProfile(@Request() req: any) {
-    const userId = req.user.id;
+  @ApiOperation({ summary: 'Get current user profile' })
+  async getMyProfile(@CurrentUser('id') userId: string) {
     const user = await this.findUserByIdUseCase.execute(userId);
-    return new UserResponseDto(user);
+    return new UserResponseDto(user, { isOwner: true, includeLevel: true });
   }
 
   @Patch('me')
-  async updateMyProfile(@Request() req: any, @Body() updateDto: UpdateUserDto) {
-    const userId = req.user.id;
+  @ApiOperation({ summary: 'Update basic profile fields' })
+  async updateMyProfile(
+    @CurrentUser('id') userId: string,
+    @Body() updateDto: UpdateUserDto,
+  ) {
     const user = await this.updateBasicInfoUseCase.execute(userId, updateDto);
-    return new UserResponseDto(user);
+    return new UserResponseDto(user, { isOwner: true, includeLevel: true });
   }
 
   @Patch('me/drunk-profile')
-  async updateMyDrunkProfile(@Request() req: any, @Body() updateDto: UpdateDrunkProfileDto) {
-    const userId = req.user.id;
+  @ApiOperation({ summary: 'Update LiquidNetwork profile section' })
+  async updateMyDrunkProfile(
+    @CurrentUser('id') userId: string,
+    @Body() updateDto: UpdateDrunkProfileDto,
+  ) {
     const user = await this.updateDrunkProfileUseCase.execute(userId, updateDto);
-    return new UserResponseDto(user);
+    return new UserResponseDto(user, { isOwner: true, includeLevel: true });
   }
 
   @Patch('me/privacy')
-  async updateMyPrivacySettings(@Request() req: any, @Body() updateDto: UpdatePrivacySettingsDto) {
-    const userId = req.user.id;
-    const user = await this.updatePrivacySettingsUseCase.execute(userId, updateDto);
-    return new UserResponseDto(user);
+  @ApiOperation({ summary: 'Update privacy settings' })
+  async updateMyPrivacySettings(
+    @CurrentUser('id') userId: string,
+    @Body() updateDto: UpdatePrivacySettingsDto,
+  ) {
+    const user = await this.updatePrivacySettingsUseCase.execute(
+      userId,
+      updateDto,
+    );
+    return new UserResponseDto(user, { isOwner: true, includeLevel: true });
   }
 
   @Patch('me/tolerance-level')
-  async updateMyToleranceLevel(@Request() req: any, @Body() updateDto: UpdateToleranceLevelDto) {
-    const userId = req.user.id;
-    const user = await this.updateToleranceLevelUseCase.execute(userId, updateDto);
-    return new UserResponseDto(user);
+  @ApiOperation({ summary: 'Update alcohol tolerance level' })
+  async updateMyToleranceLevel(
+    @CurrentUser('id') userId: string,
+    @Body() updateDto: UpdateToleranceLevelDto,
+  ) {
+    const user = await this.updateToleranceLevelUseCase.execute(
+      userId,
+      updateDto,
+    );
+    return new UserResponseDto(user, { isOwner: true, includeLevel: true });
   }
 
   @Get(':id')
-  async getUserProfile(@Param('id') id: string) {
-    // In a real app, this would check the target user's privacy settings before returning
-    const user = await this.findUserByIdUseCase.execute(id);
-    return new UserResponseDto(user);
+  @ApiOperation({ summary: 'Get user profile by id (respects privacy)' })
+  async getUserProfile(
+    @Param('id') id: string,
+    @CurrentUser('id') requesterId: string,
+  ) {
+    const { user, isOwner, includeLevel } =
+      await this.getUserProfileUseCase.execute(id, requesterId);
+    return new UserResponseDto(user, { isOwner, includeLevel });
   }
 }

@@ -66,16 +66,23 @@ export class RefreshTokenUseCase {
       throw new UnauthorizedException('User no longer exists', 'USER_NOT_FOUND');
     }
 
+    const resolvedUserId = (user as any)._id?.toString?.() ?? (user as any)._id;
+
     // Generate new tokens
-    const accessToken = this.tokenService.generateAccessToken({ sub: user._id, email: user.email });
-    const newRefreshTokenString = this.tokenService.generateRefreshToken(user._id as string);
-    const hashedNewRefreshToken = await this.tokenService.hashRefreshToken(newRefreshTokenString);
+    const accessToken = this.tokenService.generateAccessToken({
+      sub: resolvedUserId,
+      email: user.email,
+    });
+    const newRefreshTokenString =
+      this.tokenService.generateRefreshToken(resolvedUserId);
+    const hashedNewRefreshToken =
+      await this.tokenService.hashRefreshToken(newRefreshTokenString);
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     await this.refreshTokenRepository.create({
-      userId: user._id,
+      userId: (user as any)._id,
       token: hashedNewRefreshToken,
       expiresAt,
       isRevoked: false,

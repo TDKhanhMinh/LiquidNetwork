@@ -23,29 +23,44 @@ export class LoginUseCase {
   ) {}
 
   async execute(input: ILoginInput) {
-    // 1. Check if user exists
+    // Base repository excludes soft-deleted users by default.
+    // Explicit isDeleted check kept as a safety net if repository behavior changes.
     const user = await this.userRepository.findOne({ email: input.email });
-    if (!user || !user._id) {
-      throw new UnauthorizedException('Invalid email or password', 'INVALID_CREDENTIALS');
+    if (!user || !user._id || user.isDeleted) {
+      throw new UnauthorizedException(
+        'Invalid email or password',
+        'INVALID_CREDENTIALS',
+      );
     }
 
-    const authAccount = await this.authAccountRepository.findByUserId(user._id);
+    const userId = (user._id as any).toString?.() ?? user._id;
+
+    const authAccount = await this.authAccountRepository.findByUserId(userId);
     if (!authAccount || !authAccount.password) {
-      throw new UnauthorizedException('Invalid email or password', 'INVALID_CREDENTIALS');
+      throw new UnauthorizedException(
+        'Invalid email or password',
+        'INVALID_CREDENTIALS',
+      );
     }
 
-    // 3. Verify password
     const isPasswordValid = await this.passwordService.comparePassword(
       input.password,
-      authAccount.password
+      authAccount.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password', 'INVALID_CREDENTIALS');
+      throw new UnauthorizedException(
+        'Invalid email or password',
+        'INVALID_CREDENTIALS',
+      );
     }
 
-    const accessToken = this.tokenService.generateAccessToken({ sub: user._id, email: user.email });
-    const refreshTokenString = this.tokenService.generateRefreshToken(user._id as string);
-    const hashedRefreshToken = await this.tokenService.hashRefreshToken(refreshTokenString);
+    const accessToken = this.tokenService.generateAccessToken({
+      sub: userId,
+      email: user.email,
+    });
+    const refreshTokenString = this.tokenService.generateRefreshToken(userId);
+    const hashedRefreshToken =
+      await this.tokenService.hashRefreshToken(refreshTokenString);
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
@@ -59,7 +74,7 @@ export class LoginUseCase {
 
     return {
       user: {
-        id: user._id,
+        id: userId,
         name: user.name,
         email: user.email,
       },
