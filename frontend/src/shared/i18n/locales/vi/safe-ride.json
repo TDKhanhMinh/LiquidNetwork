@@ -1,0 +1,35 @@
+{
+  "title": "Đồng hành về nhà",
+  "subtitle": "Về nhà an toàn sau buổi hẹn",
+  "warning": {
+    "title": "Cảnh báo an toàn",
+    "description": "Luôn ưu tiên an toàn di chuyển sau các buổi tiệc. Hãy gọi xe hoặc nhờ người chở."
+  },
+  "fines": {
+    "title": "Mức phạt Nghị định 100",
+    "description": "Tham khảo khung xử phạt nồng độ cồn khi tham gia giao thông.",
+    "disclaimer": "Thông tin mang tính tham khảo — không thay thế tư vấn pháp lý."
+  },
+  "ride": {
+    "title": "Gọi xe nhanh",
+    "xanhSm": "Xanh SM",
+    "grab": "Grab",
+    "gojek": "Gojek",
+    "buddyDrive": "Bạn uống tôi lái",
+    "hint": "Bấm để lưu chuyến + mở app/hãng (nếu có)."
+  },
+  "history": {
+    "title": "Lịch sử chuyến",
+    "empty": "Chưa có chuyến nào.",
+    "emptyHint": "Gọi xe từ màn Safe Ride để ghi lại lịch sử.",
+    "status": {
+      "requested": "Đã gọi",
+      "completed": "Hoàn tất",
+      "cancelled": "Huỷ"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt Safe Ride",
+    "preferredProvider": "Hãng xe ưu tiên"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "Messages",
+  "subtitle": "1-1 and group chats",
+  "list": {
+    "emptyTitle": "No conversations yet",
+    "emptyDescription": "Start a chat from a Queue, Session, or a friend’s profile.",
+    "noMessages": "No messages yet",
+    "previewImage": "📷 Image",
+    "previewLocation": "📍 Location",
+    "group": "Group"
+  },
+  "thread": {
+    "placeholder": "Type a message…",
+    "send": "Send",
+    "attachImage": "Send image",
+    "shareLocation": "Share location",
+    "imagePlaceholder": "Attached image",
+    "locationShared": "Location shared",
+    "empty": "No messages yet — say hi!",
+    "direct": "Direct chat",
+    "members": "{{count}} members"
+  },
+  "context": {
+    "session": "In session",
+    "queue": "In queue"
+  }
+}

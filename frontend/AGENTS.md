@@ -34,7 +34,8 @@ app → widgets → features → entities → shared
 Inside a slice, use segments as needed:
 
 - `ui/` — React components
-- `model/` — types, hooks, client state
+- `hook/` — React hooks (`use-*`) for that slice
+- `model/` — types, pure client state (no hooks)
 - `api/` — HTTP calls for that slice
 - `lib/` — local helpers
 - `index.ts` — public exports only

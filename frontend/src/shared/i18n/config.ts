@@ -13,6 +13,15 @@ export const NAMESPACES = [
   "user",
   "drinking-session",
   "error",
+  "invitation-queue",
+  "matchmaking",
+  "safe-ride",
+  "chat",
+  "notification",
+  "friends",
+  "search",
+  "support",
+  "monetization",
 ] as const;
 
 export type AppNamespace = (typeof NAMESPACES)[number];

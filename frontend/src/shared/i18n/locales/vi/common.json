@@ -1,5 +1,6 @@
 {
   "appName": "LiquidNetwork",
+  "tagline": "Nền tảng kết nối xã hội",
   "actions": {
     "save": "Lưu",
     "cancel": "Hủy",
@@ -7,12 +8,87 @@
     "retry": "Thử lại",
     "close": "Đóng",
     "back": "Quay lại",
-    "loading": "Đang tải…"
+    "loading": "Đang tải…",
+    "continue": "Tiếp tục",
+    "skip": "Bỏ qua",
+    "done": "Xong",
+    "viewAll": "Xem tất cả",
+    "create": "Tạo mới"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "queue": "Hàng chờ",
+    "discover": "Khám phá",
+    "chat": "Chat",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "notifications": "Thông báo",
+    "ariaLabel": "Điều hướng chính"
   },
   "language": {
     "label": "Ngôn ngữ",
     "vi": "Tiếng Việt",
     "en": "English"
+  },
+  "states": {
+    "loading": {
+      "title": "Đang tải",
+      "description": "Vui lòng chờ trong giây lát…"
+    },
+    "empty": {
+      "title": "Chưa có dữ liệu",
+      "description": "Nội dung sẽ xuất hiện tại đây khi sẵn sàng."
+    },
+    "error": {
+      "title": "Không tải được",
+      "description": "Đã xảy ra lỗi. Thử lại hoặc quay lại sau."
+    },
+    "success": {
+      "title": "Thành công",
+      "description": "Thao tác đã hoàn tất."
+    },
+    "comingSoon": {
+      "title": "Sắp ra mắt",
+      "description": "Màn hình này đang được xây dựng. Quay lại sau nhé.",
+      "badge": "Sprint scaffold"
+    },
+    "maintenance": {
+      "title": "Đang bảo trì",
+      "description": "Hệ thống tạm ngưng để nâng cấp. Vui lòng thử lại sau."
+    }
+  },
+  "home": {
+    "welcome": "Chào mừng đến LiquidNetwork",
+    "subtitle": "Kết nối cộng đồng có trật tự — mời tuần tự, trò chuyện và về nhà an toàn.",
+    "ctaLogin": "Đăng nhập",
+    "ctaRegister": "Đăng ký",
+    "quickActions": "Thao tác nhanh",
+    "createQueue": "Tạo hàng chờ mời",
+    "openProfile": "Hồ sơ giao lưu",
+    "discover": "Khám phá",
+    "sessions": "Buổi hẹn",
+    "safeRide": "Đồng hành về nhà",
+    "searchPlaceholder": "Tìm người, buổi hẹn, voucher…",
+    "activeQueue": "Queue đang chạy",
+    "forYou": "Dành cho bạn",
+    "upcomingSessions": "Buổi sắp tới",
+    "noSessions": "Chưa có buổi nào — tạo ngay!",
+    "drinkingBuddies": "Bạn giao lưu gần đây",
+    "friends": "Bạn bè",
+    "premium": "Premium",
+    "vouchers": "Voucher",
+    "bookings": "Đặt bàn"
+  },
+  "settingsHub": {
+    "title": "Cài đặt",
+    "subtitle": "Tài khoản, gói dịch vụ và hỗ trợ",
+    "account": "Tài khoản",
+    "accountPrivacy": "Bảo mật & quyền riêng tư",
+    "notifications": "Thông báo",
+    "safeRide": "Safe Ride",
+    "monetization": "Gói & ưu đãi",
+    "support": "Hỗ trợ",
+    "languageHint": "Giao diện vi / en"
   },
   "errors": {
     "digest": "Mã tham chiếu: {{digest}}",

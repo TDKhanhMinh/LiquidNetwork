@@ -7,7 +7,7 @@ export function HeaderBrand() {
   const { t } = useAppTranslation("common");
 
   return (
-    <Link href="/" className="font-semibold tracking-tight">
+    <Link href="/home" className="font-semibold tracking-tight">
       {t("appName")}
     </Link>
   );

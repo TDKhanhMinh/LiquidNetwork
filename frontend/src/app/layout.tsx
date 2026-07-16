@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { AppShell } from "@/widgets/app-shell";
-import { Header } from "@/widgets/header";
+import { Be_Vietnam_Pro, JetBrains_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const beVietnam = Be_Vietnam_Pro({
+  variable: "--font-sans",
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
+  weight: ["500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "LiquidNetwork",
-  description: "LiquidNetwork frontend",
+  title: {
+    default: "LiquidNetwork",
+    template: "%s · LiquidNetwork",
+  },
+  description: "LiquidNetwork Super App — kết nối cộng đồng gặp gỡ có trách nhiệm",
 };
 
 export default function RootLayout({
@@ -28,13 +33,11 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
+      className={`dark ${beVietnam.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
-        <Providers>
-          <AppShell header={<Header />}>{children}</AppShell>
-        </Providers>
+      <body className="flex min-h-full flex-col bg-background text-foreground">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

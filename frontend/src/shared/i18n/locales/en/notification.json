@@ -1,0 +1,28 @@
+{
+  "title": "Notifications",
+  "subtitle": "Queue, session, review, chat, and system updates",
+  "categories": {
+    "all": "All",
+    "queue": "Queue",
+    "session": "Sessions",
+    "review": "Reviews",
+    "system": "System",
+    "chat": "Chat"
+  },
+  "empty": {
+    "title": "No notifications",
+    "description": "New updates will show up here."
+  },
+  "unreadCount": "{{count}} unread",
+  "allRead": "All caught up",
+  "markAllRead": "Mark all read",
+  "settings": {
+    "title": "Notification settings",
+    "subtitle": "Channels and event types",
+    "channels": "Channels",
+    "byCategory": "By category",
+    "push": "Push notifications",
+    "email": "Email",
+    "inApp": "In-app"
+  }
+}

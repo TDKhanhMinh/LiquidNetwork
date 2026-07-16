@@ -9,7 +9,6 @@ import { initI18n } from "@/shared/i18n";
 import { getQueryClient } from "@/shared/lib/queryClient";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  // Stable client for the browser session (SSR gets a fresh one via getQueryClient)
   const [queryClient] = useState(() => getQueryClient());
 
   useEffect(() => {
@@ -18,7 +17,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem={false}
+        forcedTheme="dark"
+      >
         <TooltipProvider>
           {children}
           <Toaster />

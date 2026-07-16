@@ -94,7 +94,7 @@ export function ErrorState({ kind, digest, onRetry }: ErrorStateProps) {
             ) : null}
 
             <Link
-              href="/"
+              href="/home"
               className={cn(
                 buttonVariants({
                   variant: primaryIsHome ? "default" : "outline",

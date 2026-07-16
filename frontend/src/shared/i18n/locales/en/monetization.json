@@ -1,0 +1,55 @@
+{
+  "premium": {
+    "title": "Premium plans",
+    "subtitle": "Level up your LiquidNetwork experience",
+    "popular": "Popular",
+    "current": "Current",
+    "free": "Free",
+    "perMonth": "{{price}}/month",
+    "subscribe": "Subscribe"
+  },
+  "vouchers": {
+    "title": "Deals / Vouchers",
+    "subtitle": "Discount codes and trials",
+    "empty": "No vouchers yet",
+    "expires": "Expires {{date}}",
+    "redeem": "Redeem",
+    "used": "Used"
+  },
+  "bookings": {
+    "title": "Table bookings",
+    "subtitle": "Reserve venues ahead of time",
+    "create": "New booking",
+    "createTitle": "Book a venue",
+    "createSubtitle": "Pick venue, party size, and time.",
+    "empty": "No bookings yet",
+    "emptyHint": "Book a table before the session starts.",
+    "people": "people",
+    "submit": "Confirm booking",
+    "validation": "Enter venue name and address.",
+    "fields": {
+      "venue": "Venue name",
+      "address": "Address",
+      "partySize": "Party size",
+      "time": "Time",
+      "note": "Note"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    }
+  },
+  "payments": {
+    "title": "Payment history",
+    "subtitle": "Subscriptions and bookings",
+    "empty": "No payments yet",
+    "status": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    }
+  }
+}

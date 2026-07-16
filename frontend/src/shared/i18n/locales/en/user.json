@@ -1,8 +1,105 @@
 {
   "profile": {
-    "title": "Profile",
+    "title": "Social profile",
+    "subtitle": "Your profile on LiquidNetwork",
+    "badge": "Social profile",
     "name": "Name",
     "email": "Email",
-    "bio": "Bio"
+    "bio": "Bio",
+    "edit": "Edit profile",
+    "level": "Social pace level",
+    "reviews": "Peer reviews",
+    "settings": "Account settings",
+    "public": "Public profile"
+  },
+  "fields": {
+    "name": "Display name",
+    "email": "Email",
+    "phone": "Phone",
+    "bio": "Short bio",
+    "occupation": "Occupation",
+    "education": "Education",
+    "selfIntroduction": "About you"
+  },
+  "stats": {
+    "sessions": "Sessions",
+    "acceptRate": "Accept rate",
+    "rating": "Rating",
+    "reviews": "Reviews"
+  },
+  "edit": {
+    "title": "Edit social profile",
+    "subtitle": "Update what the community sees.",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "successTitle": "Profile updated",
+    "successBody": "Your social profile has been saved.",
+    "placeholders": {
+      "occupation": "e.g. Sales, Engineer…",
+      "education": "e.g. University",
+      "selfIntroduction": "Gathering vibe, preferences, boundaries…"
+    }
+  },
+  "level": {
+    "title": "Social pace level",
+    "subtitle": "Your level and review history.",
+    "current": "Current level",
+    "change": "Update level",
+    "save": "Save level",
+    "historyTitle": "Level history",
+    "unknown": "Not set",
+    "labels": {
+      "LEVEL_1": "Light",
+      "LEVEL_2": "Social",
+      "LEVEL_3": "Active",
+      "LEVEL_4": "Expert"
+    },
+    "hints": {
+      "LEVEL_1": "Light participation, conversation first",
+      "LEVEL_2": "Balanced social gatherings",
+      "LEVEL_3": "Comfortable with lively sessions",
+      "LEVEL_4": "High energy, longer evenings"
+    }
+  },
+  "reviews": {
+    "title": "Peer reviews",
+    "titleOther": "Reviews",
+    "subtitle": "How others rate you.",
+    "subtitleOther": "View and write reviews about this person.",
+    "empty": "No reviews yet.",
+    "emptyHint": "After sessions, peer reviews will show up here.",
+    "viewAll": "View reviews",
+    "write": "Write a review",
+    "writeTitle": "Review {{name}}",
+    "writeSubtitle": "Rate honestly — it helps match better groups.",
+    "rating": "Rating (1–5)",
+    "sessionId": "Session ID",
+    "sessionHint": "ID of a shared session (required by API).",
+    "comment": "Comment",
+    "commentPlaceholder": "Fun, on time, respectful of others…",
+    "submit": "Submit review",
+    "submitting": "Submitting…",
+    "successTitle": "Review submitted",
+    "successBody": "Thanks — peer reviews build community trust.",
+    "validation": {
+      "rating": "Pick a rating from 1 to 5.",
+      "session": "Enter a session ID."
+    }
+  },
+  "settings": {
+    "title": "Account settings",
+    "subtitle": "Security, notifications, and privacy.",
+    "security": "Security",
+    "securityHint": "Password / OTP changes land in a later auth sprint.",
+    "privacy": "Privacy",
+    "hideProfile": "Hide profile",
+    "hideProfileHint": "Others cannot view your public social profile.",
+    "hideLevel": "Hide social pace level",
+    "hideLevelHint": "Hide level on public profile.",
+    "notifications": "Notifications",
+    "notifPush": "Push",
+    "notifEmail": "Email",
+    "notifInApp": "In-app",
+    "notifHint": "Local prefs — server sync in Notifications sprint."
   }
 }

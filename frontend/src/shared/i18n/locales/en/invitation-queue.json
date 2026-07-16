@@ -1,0 +1,104 @@
+{
+  "title": "Invite queue",
+  "subtitle": "Sequential invites — the right person, at the right time",
+  "hub": {
+    "create": "Create invite",
+    "history": "Invite history",
+    "active": "Active queue",
+    "emptyTitle": "No active queue",
+    "emptyDescription": "Create a Sequential Queue to invite people in priority order."
+  },
+  "create": {
+    "title": "Create queue",
+    "description": "Pick people, set order, and configure timeouts.",
+    "steps": {
+      "people": "People",
+      "config": "Configure"
+    },
+    "searchPlaceholder": "Search name, job, level…",
+    "suggestions": "Suggestions",
+    "searchResults": "Search results",
+    "selected": "Selected ({{count}})",
+    "add": "Add",
+    "remove": "Remove",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "noResults": "No people found.",
+    "nextConfig": "Next: configure",
+    "fields": {
+      "title": "Title (optional)",
+      "titlePlaceholder": "e.g. Tonight D1 table",
+      "message": "Message",
+      "messagePlaceholder": "Venue / vibe…",
+      "timeout": "Timeout per person",
+      "timeoutHint": "When time runs out, the queue advances automatically."
+    },
+    "summary": {
+      "people": "{{count}} people in priority order"
+    },
+    "submit": "Start queue",
+    "submitting": "Creating…",
+    "validation": {
+      "minPeople": "Pick at least one person to invite."
+    }
+  },
+  "live": {
+    "title": "In queue",
+    "defaultTitle": "Sequential invite",
+    "currentInvitee": "Currently inviting",
+    "noCurrent": "No active invitee",
+    "countdown": "Time left",
+    "accept": "Accept",
+    "reject": "Reject",
+    "remaining": "Queue list",
+    "waiting": "Waiting for a response…",
+    "youAreInvited": "You're being invited — respond!",
+    "matched": "Matched! Time to meet up.",
+    "cancelled": "Queue was cancelled.",
+    "finished": "Queue finished.",
+    "cancelQueue": "Cancel queue",
+    "backToHub": "Back to Queue",
+    "realtimeHint": "Live updates via poll + local events.",
+    "demoRespondHint": "Dev mock: Accept/Reject on behalf of the current invitee to test advance."
+  },
+  "history": {
+    "title": "Invite history",
+    "sent": "Sent",
+    "received": "Received",
+    "empty": "No invites yet.",
+    "emptyHint": "Create a queue or wait for someone to invite you."
+  },
+  "detail": {
+    "title": "Invite details",
+    "from": "From",
+    "to": "To",
+    "timeout": "Timeout",
+    "message": "Message",
+    "createdAt": "Created",
+    "openQueue": "Open live queue"
+  },
+  "status": {
+    "queue": {
+      "draft": "Draft",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "matched": "Matched"
+    },
+    "participant": {
+      "pending": "Pending",
+      "active": "Active",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "timeout": "Timeout",
+      "skipped": "Skipped"
+    },
+    "invitation": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "timeout": "Timeout",
+      "cancelled": "Cancelled"
+    }
+  }
+}

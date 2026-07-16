@@ -1,5 +1,6 @@
 {
   "appName": "LiquidNetwork",
+  "tagline": "Social networking platform",
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
@@ -7,12 +8,87 @@
     "retry": "Retry",
     "close": "Close",
     "back": "Back",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "continue": "Continue",
+    "skip": "Skip",
+    "done": "Done",
+    "viewAll": "View all",
+    "create": "Create"
+  },
+  "nav": {
+    "home": "Home",
+    "queue": "Queue",
+    "discover": "Discover",
+    "chat": "Chat",
+    "profile": "Profile",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "ariaLabel": "Main navigation"
   },
   "language": {
     "label": "Language",
     "vi": "Tiếng Việt",
     "en": "English"
+  },
+  "states": {
+    "loading": {
+      "title": "Loading",
+      "description": "Please wait a moment…"
+    },
+    "empty": {
+      "title": "Nothing here yet",
+      "description": "Content will show up here when it is ready."
+    },
+    "error": {
+      "title": "Could not load",
+      "description": "Something went wrong. Retry or come back later."
+    },
+    "success": {
+      "title": "Success",
+      "description": "Your action completed successfully."
+    },
+    "comingSoon": {
+      "title": "Coming soon",
+      "description": "This screen is under construction. Check back later.",
+      "badge": "Sprint scaffold"
+    },
+    "maintenance": {
+      "title": "Under maintenance",
+      "description": "We are upgrading the system. Please try again later."
+    }
+  },
+  "home": {
+    "welcome": "Welcome to LiquidNetwork",
+    "subtitle": "Connect with order — sequential invites, chat, and get home safely.",
+    "ctaLogin": "Sign in",
+    "ctaRegister": "Sign up",
+    "quickActions": "Quick actions",
+    "createQueue": "Create invite queue",
+    "openProfile": "Social profile",
+    "discover": "Discover",
+    "sessions": "Sessions",
+    "safeRide": "Safe ride",
+    "searchPlaceholder": "Search people, sessions, vouchers…",
+    "activeQueue": "Live queue",
+    "forYou": "For you",
+    "upcomingSessions": "Upcoming sessions",
+    "noSessions": "No sessions yet — create one!",
+    "drinkingBuddies": "Recent connections",
+    "friends": "Friends",
+    "premium": "Premium",
+    "vouchers": "Vouchers",
+    "bookings": "Book a table"
+  },
+  "settingsHub": {
+    "title": "Settings",
+    "subtitle": "Account, plans, and support",
+    "account": "Account",
+    "accountPrivacy": "Security & privacy",
+    "notifications": "Notifications",
+    "safeRide": "Safe Ride",
+    "monetization": "Plans & perks",
+    "support": "Support",
+    "languageHint": "UI language vi / en"
   },
   "errors": {
     "digest": "Reference: {{digest}}",

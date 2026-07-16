@@ -1,5 +1,66 @@
 {
-  "title": "Buổi nhậu",
-  "create": "Tạo buổi nhậu",
-  "empty": "Chưa có buổi nhậu nào"
+  "title": "Buổi hẹn",
+  "subtitle": "Sắp tới · Đang diễn ra · Đã kết thúc",
+  "create": "Tạo buổi hẹn",
+  "empty": "Chưa có buổi hẹn nào",
+  "emptyHint": "Tạo buổi hẹn thủ công hoặc mời từ Queue.",
+  "tabs": {
+    "live": "Đang diễn ra",
+    "upcoming": "Sắp tới",
+    "ended": "Đã xong"
+  },
+  "status": {
+    "scheduled": "Sắp tới",
+    "live": "Đang diễn ra",
+    "ended": "Đã kết thúc",
+    "cancelled": "Đã huỷ"
+  },
+  "participant": {
+    "invited": "Đã mời",
+    "accepted": "Đã nhận",
+    "checked_in": "Check-in",
+    "no_show": "Vắng",
+    "left": "Đã rời"
+  },
+  "list": {
+    "participants": "{{count}}/{{max}} người"
+  },
+  "form": {
+    "title": "Tạo buổi hẹn",
+    "subtitle": "Lên lịch địa điểm, mời người, check-in tại chỗ.",
+    "fields": {
+      "title": "Tiêu đề",
+      "location": "Địa điểm",
+      "startTime": "Thời gian bắt đầu",
+      "maxParticipants": "Số người tối đa",
+      "note": "Ghi chú",
+      "invite": "Mời thêm (demo)"
+    },
+    "placeholders": {
+      "title": "VD: Bàn tối Q1",
+      "location": "Địa chỉ quán / khu vực",
+      "note": "Tone bàn, dress code…"
+    },
+    "submit": "Tạo buổi",
+    "submitting": "Đang tạo…",
+    "validation": {
+      "required": "Nhập tiêu đề và địa điểm."
+    }
+  },
+  "detail": {
+    "participants": "Người tham gia",
+    "checkIn": "Check-in tham gia",
+    "inviteMore": "Mời thêm người",
+    "end": "Kết thúc buổi",
+    "endTitle": "Đánh giá buổi hẹn",
+    "endComment": "Nhận xét (tuỳ chọn)",
+    "confirmEnd": "Xác nhận kết thúc",
+    "cancel": "Huỷ buổi",
+    "safeRideCta": "Đồng hành về nhà"
+  },
+  "history": {
+    "title": "Lịch sử buổi hẹn",
+    "subtitle": "Các buổi đã kết thúc hoặc huỷ.",
+    "empty": "Chưa có lịch sử."
+  }
 }

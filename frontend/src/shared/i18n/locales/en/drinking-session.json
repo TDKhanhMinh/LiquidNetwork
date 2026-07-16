@@ -1,5 +1,66 @@
 {
-  "title": "Drinking session",
+  "title": "Sessions",
+  "subtitle": "Upcoming · Live · Ended",
   "create": "Create session",
-  "empty": "No drinking sessions yet"
+  "empty": "No sessions yet",
+  "emptyHint": "Create a session manually or invite from Queue.",
+  "tabs": {
+    "live": "Live",
+    "upcoming": "Upcoming",
+    "ended": "Ended"
+  },
+  "status": {
+    "scheduled": "Upcoming",
+    "live": "Live",
+    "ended": "Ended",
+    "cancelled": "Cancelled"
+  },
+  "participant": {
+    "invited": "Invited",
+    "accepted": "Accepted",
+    "checked_in": "Checked in",
+    "no_show": "No-show",
+    "left": "Left"
+  },
+  "list": {
+    "participants": "{{count}}/{{max}} people"
+  },
+  "form": {
+    "title": "Create session",
+    "subtitle": "Schedule a table, invite people, check in on-site.",
+    "fields": {
+      "title": "Title",
+      "location": "Location",
+      "startTime": "Start time",
+      "maxParticipants": "Max participants",
+      "note": "Note",
+      "invite": "Invite (demo)"
+    },
+    "placeholders": {
+      "title": "e.g. Friday beers D1",
+      "location": "Venue / area",
+      "note": "Vibe, dress code…"
+    },
+    "submit": "Create session",
+    "submitting": "Creating…",
+    "validation": {
+      "required": "Enter title and location."
+    }
+  },
+  "detail": {
+    "participants": "Participants",
+    "checkIn": "Check in",
+    "inviteMore": "Invite more",
+    "end": "End session",
+    "endTitle": "Rate this session",
+    "endComment": "Comment (optional)",
+    "confirmEnd": "Confirm end",
+    "cancel": "Cancel session",
+    "safeRideCta": "Safe ride home"
+  },
+  "history": {
+    "title": "Session history",
+    "subtitle": "Ended or cancelled sessions.",
+    "empty": "No history yet."
+  }
 }

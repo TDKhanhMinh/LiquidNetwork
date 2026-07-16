@@ -1,0 +1,35 @@
+{
+  "title": "Trung tâm hỗ trợ",
+  "subtitle": "FAQ, báo cáo và liên hệ",
+  "hub": {
+    "badge": "Support",
+    "faq": "Câu hỏi thường gặp",
+    "faqDesc": "Queue, level, Safe Ride, Premium…",
+    "report": "Báo cáo",
+    "reportDesc": "Lạm dụng, spam, sự cố thanh toán…"
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Giải đáp nhanh các tình huống phổ biến"
+  },
+  "report": {
+    "title": "Gửi báo cáo",
+    "subtitle": "Chúng tôi sẽ xem xét trong thời gian sớm nhất.",
+    "category": "Loại báo cáo",
+    "subject": "Tiêu đề",
+    "description": "Mô tả chi tiết",
+    "placeholder": "Mô tả sự việc, thời gian, người liên quan…",
+    "submit": "Gửi báo cáo",
+    "validation": "Nhập tiêu đề và mô tả (tối thiểu 10 ký tự).",
+    "successTitle": "Đã nhận báo cáo",
+    "successBody": "Cảm ơn bạn. Mã ticket đã được ghi nhận (mock).",
+    "categories": {
+      "abuse": "Lạm dụng",
+      "spam": "Spam",
+      "safety": "An toàn",
+      "payment": "Thanh toán",
+      "bug": "Lỗi app",
+      "other": "Khác"
+    }
+  }
+}

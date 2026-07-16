@@ -1,0 +1,30 @@
+{
+  "title": "Discover",
+  "subtitle": "People who match your drinking vibe",
+  "filters": {
+    "title": "Filters",
+    "level": "Tolerance level",
+    "anyLevel": "Any level",
+    "distance": "Distance",
+    "mode": "Mode",
+    "occupation": "Occupation",
+    "occupationPlaceholder": "Sales, Engineer…",
+    "apply": "Apply filters"
+  },
+  "modes": {
+    "networking": "Networking",
+    "comfort": "Comfort drinks",
+    "debate": "Debate",
+    "fight": "Drink & spar",
+    "fightDisclaimer": "This mode carries risk. Stay respectful, consensual, and safe."
+  },
+  "results": {
+    "title": "Matches",
+    "empty": "No matches yet.",
+    "emptyHint": "Try loosening filters or switching modes."
+  },
+  "cta": {
+    "createSession": "Create session",
+    "safeRide": "Safe Ride"
+  }
+}

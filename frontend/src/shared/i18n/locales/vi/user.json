@@ -1,8 +1,105 @@
 {
   "profile": {
-    "title": "Hồ sơ",
+    "title": "Hồ sơ giao lưu",
+    "subtitle": "Hồ sơ của bạn trên LiquidNetwork",
+    "badge": "Hồ sơ giao lưu",
     "name": "Tên",
     "email": "Email",
-    "bio": "Giới thiệu"
+    "bio": "Giới thiệu",
+    "edit": "Chỉnh sửa hồ sơ",
+    "level": "Cấp độ sức uống",
+    "reviews": "Peer Review",
+    "settings": "Cài đặt tài khoản",
+    "public": "Hồ sơ công khai"
+  },
+  "fields": {
+    "name": "Tên hiển thị",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "bio": "Bio ngắn",
+    "occupation": "Nghề nghiệp",
+    "education": "Học vấn",
+    "selfIntroduction": "Giới thiệu bản thân"
+  },
+  "stats": {
+    "sessions": "Buổi hẹn",
+    "acceptRate": "Tỉ lệ nhận",
+    "rating": "Rating",
+    "reviews": "Đánh giá"
+  },
+  "edit": {
+    "title": "Chỉnh sửa hồ sơ giao lưu",
+    "subtitle": "Cập nhật thông tin hiển thị với cộng đồng.",
+    "save": "Lưu thay đổi",
+    "saving": "Đang lưu…",
+    "successTitle": "Đã cập nhật",
+    "successBody": "Hồ sơ giao lưu của bạn đã được lưu.",
+    "placeholders": {
+      "occupation": "VD: Sales, Engineer…",
+      "education": "VD: ĐH Bách Khoa",
+      "selfIntroduction": "Phong cách giao lưu, sở thích, điều cần lưu ý…"
+    }
+  },
+  "level": {
+    "title": "Cấp độ sức uống",
+    "subtitle": "Mức độ phù hợp và lịch sử đánh giá.",
+    "current": "Mức hiện tại",
+    "change": "Cập nhật mức độ",
+    "save": "Lưu mức độ",
+    "historyTitle": "Lịch sử mức độ",
+    "unknown": "Chưa đặt mức độ",
+    "labels": {
+      "LEVEL_1": "Nhẹ nhàng",
+      "LEVEL_2": "Xã giao",
+      "LEVEL_3": "Tích cực",
+      "LEVEL_4": "Cao cấp"
+    },
+    "hints": {
+      "LEVEL_1": "Tham gia nhẹ, ưu tiên trò chuyện",
+      "LEVEL_2": "Cân bằng giữa trò chuyện và giao lưu",
+      "LEVEL_3": "Thoải mái tham gia các buổi sôi nổi",
+      "LEVEL_4": "Rất năng nổ, phù hợp buổi kéo dài"
+    }
+  },
+  "reviews": {
+    "title": "Peer Review",
+    "titleOther": "Đánh giá",
+    "subtitle": "Người khác đánh giá bạn như thế nào.",
+    "subtitleOther": "Xem và viết đánh giá về người này.",
+    "empty": "Chưa có đánh giá nào.",
+    "emptyHint": "Sau các buổi hẹn, peer review sẽ hiện tại đây.",
+    "viewAll": "Xem đánh giá",
+    "write": "Viết đánh giá",
+    "writeTitle": "Đánh giá {{name}}",
+    "writeSubtitle": "Chấm điểm trung thực — giúp cộng đồng ghép nhóm tốt hơn.",
+    "rating": "Điểm (1–5)",
+    "sessionId": "Mã session",
+    "sessionHint": "ID buổi hẹn đã tham gia cùng (backend yêu cầu).",
+    "comment": "Nhận xét",
+    "commentPlaceholder": "Vui, đúng hẹn, có tôn trọng người khác không…",
+    "submit": "Gửi đánh giá",
+    "submitting": "Đang gửi…",
+    "successTitle": "Đã gửi đánh giá",
+    "successBody": "Cảm ơn bạn — peer review giúp cộng đồng tin cậy hơn.",
+    "validation": {
+      "rating": "Chọn điểm từ 1 đến 5.",
+      "session": "Nhập mã session."
+    }
+  },
+  "settings": {
+    "title": "Cài đặt tài khoản",
+    "subtitle": "Bảo mật, thông báo và quyền riêng tư.",
+    "security": "Bảo mật",
+    "securityHint": "Đổi mật khẩu / OTP sẽ có ở sprint auth nâng cao.",
+    "privacy": "Quyền riêng tư",
+    "hideProfile": "Ẩn hồ sơ",
+    "hideProfileHint": "Người khác không xem được hồ sơ giao lưu công khai.",
+    "hideLevel": "Ẩn cấp độ sức uống",
+    "hideLevelHint": "Ẩn mức độ trên hồ sơ public.",
+    "notifications": "Thông báo",
+    "notifPush": "Push",
+    "notifEmail": "Email",
+    "notifInApp": "Trong app",
+    "notifHint": "Tuỳ chọn local — đồng bộ server ở sprint Notifications."
   }
 }

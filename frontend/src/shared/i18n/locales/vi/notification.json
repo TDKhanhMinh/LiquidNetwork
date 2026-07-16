@@ -1,0 +1,28 @@
+{
+  "title": "Thông báo",
+  "subtitle": "Cập nhật Queue, Session, đánh giá và hệ thống",
+  "categories": {
+    "all": "Tất cả",
+    "queue": "Hàng chờ",
+    "session": "Buổi hẹn",
+    "review": "Đánh giá",
+    "system": "Hệ thống",
+    "chat": "Chat"
+  },
+  "empty": {
+    "title": "Chưa có thông báo",
+    "description": "Khi có cập nhật mới, chúng sẽ hiện tại đây."
+  },
+  "unreadCount": "{{count}} chưa đọc",
+  "allRead": "Đã đọc hết",
+  "markAllRead": "Đọc tất cả",
+  "settings": {
+    "title": "Cài đặt thông báo",
+    "subtitle": "Kênh nhận tin và loại sự kiện",
+    "channels": "Kênh",
+    "byCategory": "Theo loại",
+    "push": "Thông báo đẩy",
+    "email": "Email",
+    "inApp": "Trong ứng dụng"
+  }
+}

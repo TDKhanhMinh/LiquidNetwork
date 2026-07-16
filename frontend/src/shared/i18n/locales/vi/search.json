@@ -1,0 +1,14 @@
+{
+  "title": "Tìm kiếm",
+  "subtitle": "Người, buổi hẹn, quán, voucher…",
+  "placeholder": "Gõ từ khóa…",
+  "empty": "Không có kết quả",
+  "emptyHint": "Thử tên người, “queue”, “premium”, “session”…",
+  "types": {
+    "user": "Người",
+    "session": "Buổi hẹn",
+    "queue": "Queue",
+    "venue": "Quán",
+    "voucher": "Ưu đãi"
+  }
+}

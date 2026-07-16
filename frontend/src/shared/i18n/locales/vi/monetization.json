@@ -1,0 +1,55 @@
+{
+  "premium": {
+    "title": "Gói Premium",
+    "subtitle": "Nâng cấp trải nghiệm LiquidNetwork",
+    "popular": "Phổ biến",
+    "current": "Đang dùng",
+    "free": "Miễn phí",
+    "perMonth": "{{price}}/tháng",
+    "subscribe": "Đăng ký"
+  },
+  "vouchers": {
+    "title": "Ưu đãi / Voucher",
+    "subtitle": "Mã giảm giá và trial",
+    "empty": "Chưa có voucher",
+    "expires": "HSD {{date}}",
+    "redeem": "Dùng",
+    "used": "Đã dùng"
+  },
+  "bookings": {
+    "title": "Đặt bàn",
+    "subtitle": "Giữ chỗ tại quán / địa điểm",
+    "create": "Đặt bàn mới",
+    "createTitle": "Đặt bàn quán",
+    "createSubtitle": "Chọn quán, số người và thời gian.",
+    "empty": "Chưa có đặt bàn",
+    "emptyHint": "Đặt bàn để giữ chỗ trước buổi hẹn.",
+    "people": "người",
+    "submit": "Xác nhận đặt bàn",
+    "validation": "Nhập tên quán và địa chỉ.",
+    "fields": {
+      "venue": "Tên quán",
+      "address": "Địa chỉ",
+      "partySize": "Số người",
+      "time": "Thời gian",
+      "note": "Ghi chú"
+    },
+    "status": {
+      "pending": "Chờ",
+      "confirmed": "Đã xác nhận",
+      "cancelled": "Huỷ",
+      "completed": "Hoàn tất"
+    }
+  },
+  "payments": {
+    "title": "Lịch sử thanh toán",
+    "subtitle": "Subscription và đặt bàn",
+    "empty": "Chưa có giao dịch",
+    "status": {
+      "paid": "Đã thanh toán",
+      "pending": "Chờ",
+      "failed": "Thất bại",
+      "refunded": "Hoàn tiền"
+    }
+  }
+}

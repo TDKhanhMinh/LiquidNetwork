@@ -1,0 +1,104 @@
+{
+  "title": "Hàng chờ mời",
+  "subtitle": "Mời tuần tự — đúng người, đúng lúc",
+  "hub": {
+    "create": "Tạo lời mời",
+    "history": "Lịch sử lời mời",
+    "active": "Đang trong hàng chờ",
+    "emptyTitle": "Chưa có hàng chờ",
+    "emptyDescription": "Tạo Sequential Queue để mời bạn giao lưu theo thứ tự ưu tiên."
+  },
+  "create": {
+    "title": "Tạo hàng chờ",
+    "description": "Chọn người, sắp thứ tự và cấu hình timeout.",
+    "steps": {
+      "people": "Chọn người",
+      "config": "Cấu hình"
+    },
+    "searchPlaceholder": "Tìm theo tên, nghề, level…",
+    "suggestions": "Gợi ý",
+    "searchResults": "Kết quả tìm kiếm",
+    "selected": "Đã chọn ({{count}})",
+    "add": "Thêm",
+    "remove": "Gỡ",
+    "moveUp": "Lên",
+    "moveDown": "Xuống",
+    "noResults": "Không tìm thấy ai.",
+    "nextConfig": "Tiếp: cấu hình",
+    "fields": {
+      "title": "Tiêu đề (tuỳ chọn)",
+      "titlePlaceholder": "VD: Bàn tối nay quận 1",
+      "message": "Lời nhắn",
+      "messagePlaceholder": "Hẹn địa điểm / tone buổi giao lưu…",
+      "timeout": "Timeout mỗi người",
+      "timeoutHint": "Hết giờ sẽ tự chuyển sang người kế tiếp."
+    },
+    "summary": {
+      "people": "{{count}} người theo thứ tự ưu tiên"
+    },
+    "submit": "Bắt đầu Queue",
+    "submitting": "Đang tạo…",
+    "validation": {
+      "minPeople": "Chọn ít nhất 1 người để mời."
+    }
+  },
+  "live": {
+    "title": "Đang trong Queue",
+    "defaultTitle": "Sequential invite",
+    "currentInvitee": "Đang mời",
+    "noCurrent": "Không có người đang mời",
+    "countdown": "Còn lại",
+    "accept": "Chấp nhận",
+    "reject": "Từ chối",
+    "remaining": "Danh sách hàng chờ",
+    "waiting": "Đang chờ phản hồi…",
+    "youAreInvited": "Bạn đang được mời — hãy phản hồi!",
+    "matched": "Đã match! Hẹn bàn thôi.",
+    "cancelled": "Queue đã bị huỷ.",
+    "finished": "Queue đã kết thúc.",
+    "cancelQueue": "Huỷ hàng chờ",
+    "backToHub": "Về Hàng chờ",
+    "realtimeHint": "Cập nhật real-time (poll + local events).",
+    "demoRespondHint": "Dev mock: bạn có thể Accept/Reject thay invitee để test advance."
+  },
+  "history": {
+    "title": "Lịch sử lời mời",
+    "sent": "Đã gửi",
+    "received": "Đã nhận",
+    "empty": "Chưa có lời mời nào.",
+    "emptyHint": "Tạo queue hoặc chờ người khác mời bạn."
+  },
+  "detail": {
+    "title": "Chi tiết lời mời",
+    "from": "Người mời",
+    "to": "Người nhận",
+    "timeout": "Timeout",
+    "message": "Lời nhắn",
+    "createdAt": "Thời gian",
+    "openQueue": "Mở Queue live"
+  },
+  "status": {
+    "queue": {
+      "draft": "Nháp",
+      "active": "Đang chạy",
+      "completed": "Hoàn tất",
+      "cancelled": "Đã huỷ",
+      "matched": "Đã match"
+    },
+    "participant": {
+      "pending": "Chờ",
+      "active": "Đang mời",
+      "accepted": "Đồng ý",
+      "rejected": "Từ chối",
+      "timeout": "Hết giờ",
+      "skipped": "Bỏ qua"
+    },
+    "invitation": {
+      "pending": "Chờ",
+      "accepted": "Đồng ý",
+      "rejected": "Từ chối",
+      "timeout": "Hết giờ",
+      "cancelled": "Huỷ"
+    }
+  }
+}

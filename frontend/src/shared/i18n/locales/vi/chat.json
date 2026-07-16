@@ -1,0 +1,27 @@
+{
+  "title": "Tin nhắn",
+  "subtitle": "Trò chuyện 1-1 và nhóm",
+  "list": {
+    "emptyTitle": "Chưa có cuộc trò chuyện",
+    "emptyDescription": "Bắt đầu chat từ Queue, Session hoặc hồ sơ bạn bè.",
+    "noMessages": "Chưa có tin nhắn",
+    "previewImage": "📷 Hình ảnh",
+    "previewLocation": "📍 Vị trí",
+    "group": "Nhóm"
+  },
+  "thread": {
+    "placeholder": "Nhập tin nhắn…",
+    "send": "Gửi",
+    "attachImage": "Gửi ảnh",
+    "shareLocation": "Gửi vị trí",
+    "imagePlaceholder": "Hình ảnh đính kèm",
+    "locationShared": "Đã chia sẻ vị trí",
+    "empty": "Chưa có tin nhắn — hãy chào nhau!",
+    "direct": "Trò chuyện 1-1",
+    "members": "{{count}} thành viên"
+  },
+  "context": {
+    "session": "Trong buổi hẹn",
+    "queue": "Trong hàng chờ"
+  }
+}

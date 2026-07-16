@@ -1,0 +1,18 @@
+{
+  "title": "Friends & buddies",
+  "subtitle": "People you connected or drank with",
+  "empty": "No one yet",
+  "emptyHint": "Match, queue, or sessions will help you meet buddies.",
+  "sessionsTogether": "{{count}} sessions together",
+  "filters": {
+    "all": "All",
+    "friend": "Friends",
+    "drinking_buddy": "Drinking buddies",
+    "both": "Both"
+  },
+  "relation": {
+    "friend": "Friend",
+    "drinking_buddy": "Buddy",
+    "both": "Friend + buddy"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Bạn bè & Bạn giao lưu",
+  "subtitle": "Người đã kết nối hoặc từng tham gia buổi hẹn cùng",
+  "empty": "Chưa có ai",
+  "emptyHint": "Match, queue hoặc session sẽ giúp bạn gặp bạn giao lưu mới.",
+  "sessionsTogether": "{{count}} buổi cùng nhau",
+  "filters": {
+    "all": "Tất cả",
+    "friend": "Bạn bè",
+    "drinking_buddy": "Bạn giao lưu",
+    "both": "Cả hai"
+  },
+  "relation": {
+    "friend": "Bạn bè",
+    "drinking_buddy": "Bạn giao lưu",
+    "both": "Bạn bè & giao lưu"
+  }
+}

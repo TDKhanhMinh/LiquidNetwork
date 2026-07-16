@@ -1,0 +1,30 @@
+{
+  "title": "Khám phá",
+  "subtitle": "Gợi ý người phù hợp để giao lưu",
+  "filters": {
+    "title": "Bộ lọc",
+    "level": "Cấp độ sức uống",
+    "anyLevel": "Mọi mức độ",
+    "distance": "Khoảng cách",
+    "mode": "Chế độ",
+    "occupation": "Ngành nghề",
+    "occupationPlaceholder": "Sales, Engineer…",
+    "apply": "Áp dụng bộ lọc"
+  },
+  "modes": {
+    "networking": "Networking",
+    "comfort": "Thư giãn",
+    "debate": "Debate",
+    "fight": "Thách đấu",
+    "fightDisclaimer": "Chế độ này có rủi ro. Hãy tôn trọng, đồng thuận và giữ an toàn."
+  },
+  "results": {
+    "title": "Người phù hợp",
+    "empty": "Chưa tìm thấy ai.",
+    "emptyHint": "Thử nới lỏng bộ lọc hoặc đổi chế độ."
+  },
+  "cta": {
+    "createSession": "Tạo buổi hẹn",
+    "safeRide": "Safe Ride"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "title": "Safe ride",
+  "subtitle": "Get home safely after drinking",
+  "warning": {
+    "title": "Safety warning",
+    "description": "Never drive after drinking. Call a ride or ask a friend."
+  },
+  "fines": {
+    "title": "Decree 100 penalties",
+    "description": "Reference fine ranges for alcohol when driving.",
+    "disclaimer": "For reference only — not legal advice."
+  },
+  "ride": {
+    "title": "Quick ride",
+    "xanhSm": "Xanh SM",
+    "grab": "Grab",
+    "gojek": "Gojek",
+    "buddyDrive": "You drink, I drive",
+    "hint": "Tap to log a ride and open the provider app when available."
+  },
+  "history": {
+    "title": "Ride history",
+    "empty": "No rides yet.",
+    "emptyHint": "Request a ride from Safe Ride to build history.",
+    "status": {
+      "requested": "Requested",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "settings": {
+    "title": "Safe Ride settings",
+    "preferredProvider": "Preferred ride provider"
+  }
+}

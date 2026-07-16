@@ -1,0 +1,14 @@
+{
+  "title": "Search",
+  "subtitle": "People, sessions, venues, vouchers…",
+  "placeholder": "Type a keyword…",
+  "empty": "No results",
+  "emptyHint": "Try a name, “queue”, “premium”, “session”…",
+  "types": {
+    "user": "Person",
+    "session": "Session",
+    "queue": "Queue",
+    "venue": "Venue",
+    "voucher": "Deal"
+  }
+}

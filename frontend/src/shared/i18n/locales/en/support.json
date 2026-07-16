@@ -1,0 +1,35 @@
+{
+  "title": "Support center",
+  "subtitle": "FAQ, reports, and help",
+  "hub": {
+    "badge": "Support",
+    "faq": "FAQ",
+    "faqDesc": "Queue, level, Safe Ride, Premium…",
+    "report": "Report",
+    "reportDesc": "Abuse, spam, payment issues…"
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Quick answers to common questions"
+  },
+  "report": {
+    "title": "Submit a report",
+    "subtitle": "We’ll review it as soon as possible.",
+    "category": "Category",
+    "subject": "Subject",
+    "description": "Details",
+    "placeholder": "Describe what happened, when, who was involved…",
+    "submit": "Submit report",
+    "validation": "Enter a subject and description (min 10 characters).",
+    "successTitle": "Report received",
+    "successBody": "Thanks. A ticket id has been recorded (mock).",
+    "categories": {
+      "abuse": "Abuse",
+      "spam": "Spam",
+      "safety": "Safety",
+      "payment": "Payment",
+      "bug": "App bug",
+      "other": "Other"
+    }
+  }
+}

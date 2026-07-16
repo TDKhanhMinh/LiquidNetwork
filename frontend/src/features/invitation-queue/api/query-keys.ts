@@ -1,4 +1,2 @@
-export const invitationQueueKeys = {
-  all: ["invitation-queue"] as const,
-  me: () => [...invitationQueueKeys.all, "me"] as const,
-};
+/** Re-export entity keys so existing imports keep working */
+export { invitationQueueKeys } from "@/entities/invitation-queue";
