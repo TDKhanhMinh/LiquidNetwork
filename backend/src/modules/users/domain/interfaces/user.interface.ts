@@ -12,7 +12,7 @@ export interface IPrivacySettings {
 }
 
 export interface IUser {
-  _id?: string;
+  _id?: any;
   name: string;
   avatar?: string;
   email: string;

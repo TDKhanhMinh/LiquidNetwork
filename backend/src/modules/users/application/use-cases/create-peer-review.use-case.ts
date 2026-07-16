@@ -1,13 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IPeerReviewRepository } from '../../domain/repositories/peer-review.repository.interface';
-import { IUserRepository } from '../../domain/repositories/user.repository.interface';
-import { CreatePeerReviewDto } from '../dtos/peer-review.dto';
+import type { IPeerReviewRepository } from '../../domain/repositories/peer-review.repository.interface';
+import type { IUserRepository } from '../../domain/repositories/user.repository.interface';
+import { CreatePeerReviewCommand } from '../dto/peer-review.command';
 import { IPeerReview } from '../../domain/interfaces/peer-review.interface';
 import { NotFoundException } from '../../../../shared/common/exceptions/not-found.exception';
 import { ConflictException } from '../../../../shared/common/exceptions/conflict.exception';
 
 @Injectable()
-export class PeerReviewsService {
+export class CreatePeerReviewUseCase {
   constructor(
     @Inject('IPeerReviewRepository')
     private readonly peerReviewRepository: IPeerReviewRepository,
@@ -15,12 +15,12 @@ export class PeerReviewsService {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async createReview(reviewerId: string, createDto: CreatePeerReviewDto): Promise<IPeerReview> {
-    if (reviewerId === createDto.revieweeId) {
+  async execute(reviewerId: string, command: CreatePeerReviewCommand): Promise<IPeerReview> {
+    if (reviewerId === command.revieweeId) {
       throw new ConflictException('You cannot review yourself');
     }
 
-    const reviewee = await this.userRepository.findById(createDto.revieweeId);
+    const reviewee = await this.userRepository.findById(command.revieweeId);
     if (!reviewee) {
       throw new NotFoundException('Reviewee not found');
     }
@@ -28,8 +28,8 @@ export class PeerReviewsService {
     // Check if review already exists for this session
     const existingReview = await this.peerReviewRepository.findOne({
       reviewerId,
-      revieweeId: createDto.revieweeId,
-      sessionId: createDto.sessionId,
+      revieweeId: command.revieweeId,
+      sessionId: command.sessionId,
     });
 
     if (existingReview) {
@@ -38,17 +38,13 @@ export class PeerReviewsService {
 
     const review = await this.peerReviewRepository.create({
       reviewerId,
-      ...createDto,
+      ...command,
     });
 
     // Update reviewee's average rating
-    await this.updateUserAverageRating(createDto.revieweeId);
+    await this.updateUserAverageRating(command.revieweeId);
 
     return review;
-  }
-
-  async getReviewsForUser(userId: string): Promise<IPeerReview[]> {
-    return this.peerReviewRepository.findAll({ revieweeId: userId });
   }
 
   private async updateUserAverageRating(userId: string): Promise<void> {

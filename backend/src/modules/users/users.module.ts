@@ -1,16 +1,22 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { User, UserSchema } from './infrastructure/schemas/user.schema';
-import { PeerReview, PeerReviewSchema } from './infrastructure/schemas/peer-review.schema';
-import { UserRepository } from './infrastructure/repositories/user.repository';
-import { PeerReviewRepository } from './infrastructure/repositories/peer-review.repository';
+import { User, UserSchema } from './infrastructure/persistence/schemas/user.schema';
+import { PeerReview, PeerReviewSchema } from './infrastructure/persistence/schemas/peer-review.schema';
+import { UserRepository } from './infrastructure/persistence/repositories/user.repository';
+import { PeerReviewRepository } from './infrastructure/persistence/repositories/peer-review.repository';
 
-import { UsersService } from './application/services/users.service';
-import { PeerReviewsService } from './application/services/peer-reviews.service';
+import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
+import { FindUserByIdUseCase } from './application/use-cases/find-user-by-id.use-case';
+import { UpdateBasicInfoUseCase } from './application/use-cases/update-basic-info.use-case';
+import { UpdateDrunkProfileUseCase } from './application/use-cases/update-drunk-profile.use-case';
+import { UpdatePrivacySettingsUseCase } from './application/use-cases/update-privacy-settings.use-case';
+import { UpdateToleranceLevelUseCase } from './application/use-cases/update-tolerance-level.use-case';
+import { CreatePeerReviewUseCase } from './application/use-cases/create-peer-review.use-case';
+import { GetReviewsForUserUseCase } from './application/use-cases/get-reviews-for-user.use-case';
 
-import { UsersController } from './presentation/controllers/users.controller';
-import { PeerReviewsController } from './presentation/controllers/peer-reviews.controller';
+import { UsersController } from './presentation/http/users.controller';
+import { PeerReviewsController } from './presentation/http/peer-reviews.controller';
 
 @Module({
   imports: [
@@ -29,11 +35,16 @@ import { PeerReviewsController } from './presentation/controllers/peer-reviews.c
       provide: 'IPeerReviewRepository',
       useClass: PeerReviewRepository,
     },
-    UsersService,
-    PeerReviewsService,
+    CreateUserUseCase,
+    FindUserByIdUseCase,
+    UpdateBasicInfoUseCase,
+    UpdateDrunkProfileUseCase,
+    UpdatePrivacySettingsUseCase,
+    UpdateToleranceLevelUseCase,
+    CreatePeerReviewUseCase,
+    GetReviewsForUserUseCase,
   ],
   exports: [
-    UsersService,
     {
       provide: 'IUserRepository',
       useClass: UserRepository,

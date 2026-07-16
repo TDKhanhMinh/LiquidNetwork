@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { IPeerReview } from '../../domain/interfaces/peer-review.interface';
+import { IPeerReview } from '../../../domain/interfaces/peer-review.interface';
 
 export type PeerReviewDocument = PeerReview & Document;
 

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { AlcoholToleranceLevel } from '../../domain/enums/alcohol-tolerance-level.enum';
-import { IDrunkProfile, IPrivacySettings, IUser } from '../../domain/interfaces/user.interface';
+import { AlcoholToleranceLevel } from '../../../domain/enums/alcohol-tolerance-level.enum';
+import { IDrunkProfile, IPrivacySettings, IUser } from '../../../domain/interfaces/user.interface';
 
 @Schema({ _id: false })
 export class DrunkProfile implements IDrunkProfile {

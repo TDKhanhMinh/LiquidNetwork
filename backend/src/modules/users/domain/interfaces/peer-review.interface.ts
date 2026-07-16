@@ -1,5 +1,5 @@
 export interface IPeerReview {
-  _id?: string;
+  _id?: any;
   reviewerId: string;
   revieweeId: string;
   sessionId: string;
