@@ -1,0 +1,49 @@
+{
+  "appName": "LiquidNetwork",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "retry": "Retry",
+    "close": "Close",
+    "back": "Back",
+    "loading": "Loading…"
+  },
+  "language": {
+    "label": "Language",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "errors": {
+    "digest": "Reference: {{digest}}",
+    "actions": {
+      "home": "Back to home",
+      "login": "Sign in"
+    },
+    "not-found": {
+      "code": "404",
+      "title": "Page not found",
+      "description": "The page you are looking for does not exist or has been moved."
+    },
+    "forbidden": {
+      "code": "403",
+      "title": "Permission denied",
+      "description": "You do not have permission to view this content. Contact an admin if you need access."
+    },
+    "unauthorized": {
+      "code": "401",
+      "title": "Sign in required",
+      "description": "Your session is missing or has expired. Please sign in to continue."
+    },
+    "server": {
+      "code": "500",
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. You can retry or return to the home page."
+    },
+    "generic": {
+      "code": "Error",
+      "title": "Something went wrong",
+      "description": "This page could not be displayed. Please try again later."
+    }
+  }
+}

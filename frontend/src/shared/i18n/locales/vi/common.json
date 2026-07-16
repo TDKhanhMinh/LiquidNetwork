@@ -1,0 +1,49 @@
+{
+  "appName": "LiquidNetwork",
+  "actions": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "retry": "Thử lại",
+    "close": "Đóng",
+    "back": "Quay lại",
+    "loading": "Đang tải…"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "errors": {
+    "digest": "Mã tham chiếu: {{digest}}",
+    "actions": {
+      "home": "Về trang chủ",
+      "login": "Đăng nhập"
+    },
+    "not-found": {
+      "code": "404",
+      "title": "Không tìm thấy trang",
+      "description": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển."
+    },
+    "forbidden": {
+      "code": "403",
+      "title": "Không có quyền truy cập",
+      "description": "Bạn không được phép xem nội dung này. Nếu cần quyền, hãy liên hệ quản trị viên."
+    },
+    "unauthorized": {
+      "code": "401",
+      "title": "Cần đăng nhập",
+      "description": "Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập để tiếp tục."
+    },
+    "server": {
+      "code": "500",
+      "title": "Đã xảy ra lỗi",
+      "description": "Hệ thống gặp sự cố không mong muốn. Bạn có thể thử lại hoặc quay về trang chủ."
+    },
+    "generic": {
+      "code": "Error",
+      "title": "Có lỗi xảy ra",
+      "description": "Không thể hiển thị trang này. Vui lòng thử lại sau."
+    }
+  }
+}

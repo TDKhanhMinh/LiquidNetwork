@@ -1,0 +1,21 @@
+{
+  "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "UNAUTHORIZED": "Phiên đăng nhập không hợp lệ.",
+  "VALIDATION_ERROR": "Dữ liệu không hợp lệ.",
+  "NOT_FOUND": "Không tìm thấy tài nguyên.",
+  "CONFLICT": "Dữ liệu đã tồn tại hoặc xung đột.",
+  "FORBIDDEN": "Bạn không có quyền thực hiện thao tác này.",
+  "BAD_REQUEST": "Yêu cầu không hợp lệ.",
+  "INTERNAL_SERVER_ERROR": "Lỗi máy chủ. Vui lòng thử lại sau.",
+  "DATABASE_ERROR": "Lỗi cơ sở dữ liệu. Vui lòng thử lại sau.",
+  "QUEUE_ERROR": "Lỗi hàng đợi. Vui lòng thử lại sau.",
+  "EXTERNAL_SERVICE_ERROR": "Dịch vụ bên ngoài gặp sự cố.",
+  "NETWORK_ERROR": "Không thể kết nối máy chủ.",
+  "DUPLICATE_KEY_ERROR": "Dữ liệu đã tồn tại.",
+  "INVALID_DATA_TYPE": "Kiểu dữ liệu không hợp lệ.",
+  "INVALID_REFRESH_TOKEN": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+  "REFRESH_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+  "TOKEN_REUSE_DETECTED": "Phát hiện phiên không an toàn. Vui lòng đăng nhập lại.",
+  "USER_NOT_FOUND": "Không tìm thấy người dùng.",
+  "INVITATION_TIMEOUT": "Hết thời gian chờ lời mời."
+}

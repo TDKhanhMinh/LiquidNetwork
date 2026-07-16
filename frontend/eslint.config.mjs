@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // shadcn-generated UI + hooks often sync DOM/media state in effects
+  {
+    files: ["src/shared/ui/**/*.{ts,tsx}", "src/shared/hooks/use-mobile.ts"],
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
