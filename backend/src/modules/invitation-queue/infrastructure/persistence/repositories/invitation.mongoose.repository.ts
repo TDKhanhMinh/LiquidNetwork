@@ -103,7 +103,7 @@ export class InvitationMongooseRepository
             ...(extras ?? {}),
           },
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec() as Promise<IInvitation | null>;
   }

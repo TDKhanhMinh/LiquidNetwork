@@ -61,7 +61,7 @@ export class InvitationQueueMongooseRepository
               : {}),
           },
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec() as Promise<IInvitationQueue | null>;
   }
@@ -83,7 +83,7 @@ export class InvitationQueueMongooseRepository
     }
 
     return this.model
-      .findOneAndUpdate(filter, { $set: next }, { new: true })
+      .findOneAndUpdate(filter, { $set: next }, { returnDocument: 'after' })
       .exec() as Promise<IInvitationQueue | null>;
   }
 }

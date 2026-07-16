@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { BaseRepository } from '../../../../../shared/database/repositories/base.repository';
-import { IUserRepository } from '../../../domain/repositories/user.repository.interface';
+import {
+  FindMatchingPoolParams,
+  IUserRepository,
+} from '../../../domain/repositories/user.repository.interface';
 import { IUser } from '../../../domain/interfaces/user.interface';
 import { User, UserDocument } from '../schemas/user.schema';
 
@@ -59,6 +62,47 @@ export class UserRepository extends BaseRepository<UserDocument> implements IUse
         _id: { $in: objectIds },
         isDeleted: { $ne: true },
       })
+      .exec() as Promise<IUser[]>;
+  }
+
+  async findMatchingPool(params: FindMatchingPoolParams): Promise<IUser[]> {
+    const {
+      excludeUserId,
+      alcoholToleranceLevels,
+      excludeUserIds = [],
+      limit,
+    } = params;
+
+    const filter: Record<string, unknown> = {
+      isDeleted: { $ne: true },
+      'privacySettings.hideProfile': { $ne: true },
+    };
+
+    const excludedIds: Types.ObjectId[] = [];
+    const allExclude = [excludeUserId, ...excludeUserIds]
+      .map(String)
+      .filter(Boolean);
+
+    for (const id of allExclude) {
+      if (Types.ObjectId.isValid(id)) {
+        excludedIds.push(new Types.ObjectId(id));
+      }
+    }
+
+    if (excludedIds.length) {
+      filter._id = { $nin: excludedIds };
+    }
+
+    if (alcoholToleranceLevels?.length) {
+      filter.alcoholToleranceLevel = { $in: alcoholToleranceLevels };
+    }
+
+    const capped = Math.min(500, Math.max(1, Math.floor(limit)));
+
+    return this.model
+      .find(filter)
+      .sort({ updatedAt: -1 })
+      .limit(capped)
       .exec() as Promise<IUser[]>;
   }
 }

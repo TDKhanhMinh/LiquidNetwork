@@ -12,6 +12,7 @@ import { ResponseInterceptor } from './shared/common/interceptors/response.inter
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { InvitationQueueModule } from './modules/invitation-queue/invitation-queue.module';
+import { MatchingModule } from './modules/matching/matching.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { InvitationQueueModule } from './modules/invitation-queue/invitation-que
     AuthModule,
     UsersModule,
     InvitationQueueModule,
+    MatchingModule,
   ],
   controllers: [AppController],
   providers: [

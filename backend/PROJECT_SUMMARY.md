@@ -43,7 +43,7 @@ src/
 │   ├── chat/                 # Tính năng nhắn tin
 │   ├── drinking-sessions/    # Quản lý các buổi tiệc
 │   ├── invitation-queue/     # Hệ thống gửi lời mời tuần tự (có timeout)
-│   ├── matchmaking/          # Tìm người uống cùng mức tửu lượng
+│   ├── matching/             # Ranking ứng viên (compatibility score → Invitation Queue)
 │   ├── notifications/        # Thông báo Push/In-app
 │   ├── safe-ride/            # Đặt xe "Đã uống không lái"
 │   └── users/                # Quản lý User, Drunk Profile, Peer Reviews

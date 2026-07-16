@@ -47,7 +47,8 @@ export type InvitationQueueDocument = InvitationQueue & Document;
 
 @Schema({ timestamps: true, collection: 'invitation_queues' })
 export class InvitationQueue implements IInvitationQueue {
-  @Prop({ type: String, required: true, index: true })
+  // Index via partial unique on hostId (active queues) below — avoid duplicate index warning
+  @Prop({ type: String, required: true })
   hostId: string;
 
   @Prop({ type: String, required: true })

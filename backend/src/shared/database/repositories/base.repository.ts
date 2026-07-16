@@ -82,11 +82,19 @@ export abstract class BaseRepository<T extends Document, K = string> implements 
 
   async updateById(id: K, data: Partial<T> | unknown): Promise<T | null> {
     const filter = this.enrichFilter({ _id: id });
-    return this.model.findOneAndUpdate(filter, data as UpdateQueryType<T>, { new: true }).exec() as Promise<T | null>;
+    return this.model
+      .findOneAndUpdate(filter, data as UpdateQueryType<T>, {
+        returnDocument: 'after',
+      })
+      .exec() as Promise<T | null>;
   }
 
   async updateOne(filter: FilterQueryType<T>, data: Partial<T> | unknown): Promise<T | null> {
-    return this.model.findOneAndUpdate(this.enrichFilter(filter), data as UpdateQueryType<T>, { new: true }).exec() as Promise<T | null>;
+    return this.model
+      .findOneAndUpdate(this.enrichFilter(filter), data as UpdateQueryType<T>, {
+        returnDocument: 'after',
+      })
+      .exec() as Promise<T | null>;
   }
 
   async deleteById(id: K, softDelete: boolean = true): Promise<boolean> {
