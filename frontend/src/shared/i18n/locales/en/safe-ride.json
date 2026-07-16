@@ -1,6 +1,17 @@
 {
   "title": "Safe ride",
   "subtitle": "Get home safely after drinking",
+  "ad": {
+    "badge": "Safe Ride",
+    "title": "Don't drive after drinking",
+    "description": "Book a safe ride in one tap. Penalty ranges appear right after this ad.",
+    "item1": "Quick call Grab, Xanh SM, Gojek, or a sober buddy",
+    "item2": "Review Decree 100 fine ranges before heading home",
+    "item3": "Put safety first for you and your loved ones",
+    "note": "Safety reminder ad — you can skip anytime.",
+    "skip": "Skip ad",
+    "countdown": "Closes in {{count}}s"
+  },
   "warning": {
     "title": "Safety warning",
     "description": "Never drive after drinking. Call a ride or ask a friend."

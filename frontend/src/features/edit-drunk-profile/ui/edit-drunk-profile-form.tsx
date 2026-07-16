@@ -103,10 +103,10 @@ export function EditDrunkProfileForm() {
   const pending = updateBasic.isPending || updateDrunk.isPending;
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 py-6">
+    <div className="page-shell gap-5 md:gap-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{t("edit.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("edit.subtitle")}</p>
+        <h1 className="page-title">{t("edit.title")}</h1>
+        <p className="page-subtitle">{t("edit.subtitle")}</p>
       </header>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>

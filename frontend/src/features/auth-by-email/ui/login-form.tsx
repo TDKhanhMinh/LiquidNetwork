@@ -40,13 +40,17 @@ export function LoginForm({ className, embedded }: LoginFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className={cn("flex flex-col gap-5", className)}
+      className={cn("flex flex-col gap-5 md:gap-6", className)}
       noValidate
     >
       {!embedded ? (
-        <div className="space-y-1">
-          <h2 className="text-lg font-semibold">{t("login.title")}</h2>
-          <p className="text-sm text-muted-foreground">{t("login.subtitle")}</p>
+        <div className="space-y-1.5">
+          <h2 className="text-lg font-semibold md:text-xl">
+            {t("login.title")}
+          </h2>
+          <p className="text-sm text-muted-foreground md:text-[0.9375rem]">
+            {t("login.subtitle")}
+          </p>
         </div>
       ) : null}
 

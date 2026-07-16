@@ -173,9 +173,9 @@ export function ChatThreadScreen({ conversationId }: ChatThreadScreenProps) {
             : null;
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-8rem)] w-full max-w-lg flex-col">
+    <div className="mx-auto flex h-[calc(100dvh-8rem)] w-full flex-col md:h-[calc(100dvh-9rem)]">
       {/* Header */}
-      <header className="flex items-center gap-2 border-b border-border px-3 py-3">
+      <header className="flex items-center gap-2 border-b border-border px-3 py-3 md:px-4 md:py-3.5">
         <Link
           href={routes.chat}
           className="inline-flex size-10 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"

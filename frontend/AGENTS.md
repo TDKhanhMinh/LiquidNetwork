@@ -78,6 +78,7 @@ Helpers: `import { notFound, forbidden, unauthorized } from "@/shared/lib"`.
 - **apiClient**: `src/shared/api/apiClient.ts` — typed get/post/… (unwraps `{ success, data }`)
 - **Tokens**: `localStorage` keys `access_token`, `refresh_token` via `tokenStorage`
 - **Env**: `NEXT_PUBLIC_API_BASE_URL` (fallback `NEXT_PUBLIC_API_URL`)
+- **API contract**: `docs/API_ENDPOINTS.md` — mirror of backend Nest docs (Matching, Invitation Queue, Auth, Users). Source of truth remains `backend/docs/API_ENDPOINTS.md`; re-sync after backend API changes.
 - **TanStack Query**: `src/shared/lib/queryClient.ts` + `QueryClientProvider` in `app/providers.tsx`
 - Entity APIs call `apiClient`; features own React Query hooks
 - Errors: `normalizeApiError` / `resolveErrorMessage` map `error.code` → i18n `error:*`

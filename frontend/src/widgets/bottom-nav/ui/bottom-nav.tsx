@@ -4,13 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { chatApi, chatKeys } from "@/entities/chat";
+import { MAIN_TABS, isTabActive } from "@/shared/config";
 import { useAppTranslation } from "@/shared/hooks/use-app-translation";
 import { cn } from "@/shared/lib/utils";
-import { isTabActive, MAIN_TABS } from "../model/tabs";
 
 /**
- * Mobile-first primary navigation — Night Amber Social.
- * Chat tab shows unread badge from entity chat API.
+ * Mobile thumb-zone tabs — phones only.
+ * Primary navigation always lives in the header (HeaderMainNav);
+ * this bar is an extra shortcut under `md`, not a replacement that
+ * makes header nav disappear.
  */
 export function BottomNav() {
   const pathname = usePathname() ?? "/";
@@ -24,9 +26,15 @@ export function BottomNav() {
   return (
     <nav
       aria-label={ready ? t("nav.ariaLabel") : "Main"}
-      className="sticky bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md supports-backdrop-filter:bg-card/80"
+      className={[
+        "border-t border-border bg-card/95 backdrop-blur-md",
+        "supports-backdrop-filter:bg-card/80",
+        "pb-[env(safe-area-inset-bottom)]",
+        /* Only pure mobile — tablet/desktop use header nav alone */
+        "md:hidden",
+      ].join(" ")}
     >
-      <ul className="mx-auto flex h-16 max-w-lg items-stretch justify-between gap-1 px-2 pb-[env(safe-area-inset-bottom)]">
+      <ul className="flex h-16 items-stretch justify-between gap-1 px-1.5">
         {MAIN_TABS.map((tab) => {
           const active = isTabActive(pathname, tab);
           const Icon = tab.icon;

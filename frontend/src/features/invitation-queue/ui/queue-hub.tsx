@@ -37,18 +37,18 @@ export function QueueHub() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-6">
-      <header className="mb-4 space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+    <div className="page-shell">
+      <header className="mb-4 space-y-1 md:mb-6 md:space-y-1.5">
+        <h1 className="page-title">{t("title")}</h1>
+        <p className="page-subtitle">{t("subtitle")}</p>
       </header>
 
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex gap-2 md:mb-8 md:gap-3">
         <Link
           href={routes.queueNew}
           className={cn(
             buttonVariants({ variant: "default" }),
-            "min-h-11 flex-1 rounded-xl",
+            "min-h-11 flex-1 rounded-xl md:min-h-12",
           )}
         >
           <PlusIcon />
@@ -58,7 +58,7 @@ export function QueueHub() {
           href={routes.queueHistory}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "min-h-11 flex-1 rounded-xl",
+            "min-h-11 flex-1 rounded-xl md:min-h-12",
           )}
         >
           <HistoryIcon />
@@ -69,7 +69,7 @@ export function QueueHub() {
       {active && active.status === "active" ? (
         <Link
           href={routes.queueLive(active.id)}
-          className="mb-4 block rounded-2xl border border-primary/40 bg-primary/10 p-4 shadow-amber-glow ring-1 ring-primary/20 transition-colors active:bg-primary/15"
+          className="mb-4 block rounded-2xl border border-primary/40 bg-primary/10 p-4 shadow-amber-glow ring-1 ring-primary/20 transition-colors active:bg-primary/15 md:mb-5 md:p-5"
         >
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -78,14 +78,14 @@ export function QueueHub() {
                 {t("hub.active")}
               </Badge>
             </div>
-            <span className="font-mono text-sm font-semibold text-primary">
+            <span className="font-mono text-sm font-semibold text-primary md:text-base">
               {label}
             </span>
           </div>
-          <p className="mt-2 text-sm font-medium">
+          <p className="mt-2 text-sm font-medium md:text-[0.9375rem]">
             {t("live.currentInvitee")}: {current?.name ?? "—"}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground md:text-sm">
             {active.title}
           </p>
         </Link>
@@ -99,7 +99,7 @@ export function QueueHub() {
               href={routes.queueNew}
               className={cn(
                 buttonVariants({ variant: "default" }),
-                "rounded-xl",
+                "min-h-11 rounded-xl",
               )}
             >
               {t("hub.create")}

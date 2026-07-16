@@ -36,7 +36,7 @@ export default function RootLayout({
       className={`dark ${beVietnam.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-background text-foreground">
+      <body className="flex min-h-dvh flex-col bg-[#0B0F19] text-foreground">
         <Providers>{children}</Providers>
       </body>
     </html>

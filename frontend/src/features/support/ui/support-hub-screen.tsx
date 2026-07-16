@@ -30,7 +30,7 @@ export function SupportHubScreen() {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 py-6">
+    <div className="page-shell gap-5 md:gap-6">
       <header className="space-y-1">
         <div className="flex items-center gap-2 text-primary">
           <LifeBuoyIcon className="size-5" />
@@ -38,8 +38,8 @@ export function SupportHubScreen() {
             {t("hub.badge")}
           </p>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        <h1 className="page-title">{t("title")}</h1>
+        <p className="page-subtitle">{t("subtitle")}</p>
       </header>
 
       <ul className="overflow-hidden rounded-2xl border border-border bg-card">

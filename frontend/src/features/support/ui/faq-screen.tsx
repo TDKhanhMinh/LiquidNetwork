@@ -31,10 +31,10 @@ export function FaqScreen() {
   const items = data ?? [];
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 px-4 py-6">
+    <div className="page-shell gap-4 md:gap-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{t("faq.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("faq.subtitle")}</p>
+        <h1 className="page-title">{t("faq.title")}</h1>
+        <p className="page-subtitle">{t("faq.subtitle")}</p>
       </header>
 
       <Accordion className="w-full">
@@ -48,7 +48,7 @@ export function FaqScreen() {
                 {item.question}
               </span>
             </AccordionTrigger>
-            <AccordionContent className="text-sm text-muted-foreground">
+            <AccordionContent className="page-subtitle">
               {item.answer}
             </AccordionContent>
           </AccordionItem>

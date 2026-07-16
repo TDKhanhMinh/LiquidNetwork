@@ -56,10 +56,10 @@ export function SessionDetailScreen({ sessionId }: SessionDetailScreenProps) {
     session.status === "scheduled" || session.status === "live";
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 py-6">
+    <div className="page-shell gap-5 md:gap-6">
       <header className="space-y-2">
         <div className="flex items-start justify-between gap-2">
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="page-title">
             {session.title}
           </h1>
           <Badge>{t(`status.${session.status}`)}</Badge>

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAppTranslation } from "@/shared/hooks/use-app-translation";
 import { env } from "@/shared/config";
+import { AppFrame } from "@/shared/ui/app-frame";
 import { Button, buttonVariants } from "@/shared/ui/button";
 import {
   Empty,
@@ -48,22 +49,23 @@ export function ErrorState({ kind, digest, onRetry }: ErrorStateProps) {
   const primaryIsHome = kind !== "unauthorized" && !onRetry;
 
   return (
-    <div className="flex flex-1 items-center justify-center px-4 py-16">
+    <AppFrame>
+      <div className="page-shell flex-1 items-center justify-center py-16 md:py-20">
       <Empty className="max-w-md border-0">
         <EmptyHeader>
           <EmptyMedia
             variant="icon"
-            className="size-12 rounded-xl [&_svg]:size-6"
+            className="size-12 rounded-xl md:size-14 [&_svg]:size-6 md:[&_svg]:size-7"
           >
             <Icon aria-hidden />
           </EmptyMedia>
-          <p className="font-mono text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          <p className="font-mono text-xs font-medium tracking-widest text-muted-foreground uppercase md:text-[0.8125rem]">
             {code}
           </p>
-          <EmptyTitle className="text-xl font-semibold tracking-tight">
+          <EmptyTitle className="text-xl font-semibold tracking-tight md:text-2xl">
             {title}
           </EmptyTitle>
-          <EmptyDescription className="text-base">
+          <EmptyDescription className="text-base md:text-[1.05rem]">
             {description}
           </EmptyDescription>
           {digest ? (
@@ -107,6 +109,7 @@ export function ErrorState({ kind, digest, onRetry }: ErrorStateProps) {
           </div>
         </EmptyContent>
       </Empty>
-    </div>
+      </div>
+    </AppFrame>
   );
 }

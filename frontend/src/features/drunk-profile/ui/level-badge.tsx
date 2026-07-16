@@ -27,17 +27,17 @@ export function LevelBadge({ level, className, showHint }: LevelBadgeProps) {
   }
 
   return (
-    <div className={cn("inline-flex flex-col gap-0.5", className)}>
+    <div className={cn("inline-flex flex-col gap-0.5 md:gap-1", className)}>
       <span
         className={cn(
-          "inline-flex w-fit items-center rounded-xl px-3 py-1 text-sm font-semibold",
+          "inline-flex w-fit items-center rounded-xl px-3 py-1 text-sm font-semibold md:px-3.5 md:py-1.5 md:text-[0.9375rem]",
           LEVEL_STYLES[level] ?? "bg-muted text-foreground",
         )}
       >
         {t(`level.labels.${level}`, { defaultValue: level })}
       </span>
       {showHint ? (
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground md:text-[0.8125rem]">
           {t(`level.hints.${level}`, { defaultValue: "" })}
         </span>
       ) : null}

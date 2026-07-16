@@ -62,10 +62,10 @@ export function LevelScreen() {
     "LEVEL_2") as AlcoholToleranceLevel;
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
+    <div className="page-shell gap-6 md:gap-7">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{t("level.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("level.subtitle")}</p>
+        <h1 className="page-title">{t("level.title")}</h1>
+        <p className="page-subtitle">{t("level.subtitle")}</p>
       </header>
 
       <section className="rounded-2xl border border-border bg-card p-5 text-center ring-1 ring-primary/10">
@@ -123,7 +123,7 @@ export function LevelScreen() {
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">{t("level.historyTitle")}</h2>
         {history.isLoading ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="page-subtitle">
             {t("common:actions.loading")}
           </p>
         ) : (

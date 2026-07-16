@@ -12,34 +12,34 @@ export type ApiRequestConfig = Omit<AxiosRequestConfig, "params"> &
  * Response interceptor already unwraps `data` when `success: true`.
  */
 export const apiClient = {
-  get<T>(url: string, config?: ApiRequestConfig): Promise<T> {
-    return axiosInstance
-      .get<T>(url, config as AppAxiosRequestConfig)
-      .then((res) => res.data);
+  async get<T>(url: string, config?: ApiRequestConfig): Promise<T> {
+    const res = await axiosInstance
+      .get<T>(url, config as AppAxiosRequestConfig);
+    return res.data;
   },
 
-  post<T>(url: string, body?: unknown, config?: ApiRequestConfig): Promise<T> {
-    return axiosInstance
-      .post<T>(url, body, config as AppAxiosRequestConfig)
-      .then((res) => res.data);
+  async post<T>(url: string, body?: unknown, config?: ApiRequestConfig): Promise<T> {
+    const res = await axiosInstance
+      .post<T>(url, body, config as AppAxiosRequestConfig);
+    return res.data;
   },
 
-  put<T>(url: string, body?: unknown, config?: ApiRequestConfig): Promise<T> {
-    return axiosInstance
-      .put<T>(url, body, config as AppAxiosRequestConfig)
-      .then((res) => res.data);
+  async put<T>(url: string, body?: unknown, config?: ApiRequestConfig): Promise<T> {
+    const res = await axiosInstance
+      .put<T>(url, body, config as AppAxiosRequestConfig);
+    return res.data;
   },
 
-  patch<T>(url: string, body?: unknown, config?: ApiRequestConfig): Promise<T> {
-    return axiosInstance
-      .patch<T>(url, body, config as AppAxiosRequestConfig)
-      .then((res) => res.data);
+  async patch<T>(url: string, body?: unknown, config?: ApiRequestConfig): Promise<T> {
+    const res = await axiosInstance
+      .patch<T>(url, body, config as AppAxiosRequestConfig);
+    return res.data;
   },
 
-  delete<T>(url: string, config?: ApiRequestConfig): Promise<T> {
-    return axiosInstance
-      .delete<T>(url, config as AppAxiosRequestConfig)
-      .then((res) => res.data);
+  async delete<T>(url: string, config?: ApiRequestConfig): Promise<T> {
+    const res = await axiosInstance
+      .delete<T>(url, config as AppAxiosRequestConfig);
+    return res.data;
   },
 
   /**

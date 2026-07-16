@@ -82,7 +82,7 @@ export function VerifyOtpForm({
   if (!phone) {
     return (
       <div className="space-y-4 text-center">
-        <p className="text-sm text-muted-foreground">
+        <p className="page-subtitle">
           {t("verifyOtp.missingPhone")}
         </p>
         <Link
@@ -105,7 +105,7 @@ export function VerifyOtpForm({
         <h1 className="text-2xl font-semibold tracking-tight">
           {ready ? t("verifyOtp.title") : "…"}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="page-subtitle">
           {t("verifyOtp.subtitle", { destination })}
         </p>
       </div>

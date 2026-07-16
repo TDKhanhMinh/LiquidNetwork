@@ -1,9 +1,23 @@
-# LiquidNetwork Backend — Thống kê & mô tả Request / Response
+# LiquidNetwork — API Endpoints (Frontend copy)
 
-> **Phiên bản tài liệu:** 1.1  
-> **Nguồn:** code tại `src/` (controllers, DTOs, interceptors, filters)  
-> **Base URL:** `http://localhost:{PORT}/api` (mặc định `PORT=3000`)  
-> **Swagger (dev):** `http://localhost:{PORT}/api/docs`
+> **Phiên bản tài liệu:** 2.0  
+> **Đồng bộ từ:** `backend/docs/API_ENDPOINTS.md` (16/07/2026)  
+> **Source of truth:** backend NestJS — file này là **bản mirror** cho FE/FSD. Khi backend đổi API, cập nhật backend trước rồi copy lại (hoặc re-sync).  
+> **Nguồn scan:** `backend/src/` (controllers, DTOs, `AppModule`, interceptors, filters)  
+> **Backend Base URL:** `http://localhost:{PORT}/api` (Nest default `PORT=3000`)  
+> **Swagger (dev):** `http://localhost:{PORT}/api/docs`  
+> **FE env:** `NEXT_PUBLIC_API_BASE_URL` (xem `src/shared/config/env.ts`, `.env.example`) — nên trỏ tới host + prefix khớp backend (vd. `http://localhost:3000/api`)
+
+### Ghi chú cho frontend (FSD)
+
+| Mục | Chi tiết |
+|-----|----------|
+| HTTP client | `src/shared/api/axiosInstance.ts` + `apiClient.ts` |
+| Envelope | Interceptor **unwrap** `{ success, data }` → `apiClient.*` trả thẳng payload `data` |
+| Tokens | `localStorage`: `access_token`, `refresh_token` |
+| Path gọi API | Relative path **không** lặp prefix nếu base URL đã gồm `/api` (vd. `get('/users/me')`) |
+| Matching | Module mới — xem §6; handoff queue §12 |
+| Route 404 hiện tại | §9 — FE home poll notifications/chat/friends/ads/sessions GET |
 
 ---
 
@@ -11,33 +25,37 @@
 
 ### 1.1. Thống kê endpoint (theo code hiện có)
 
-| Module | Controller path | Số endpoint | Mounted trong `AppModule` | Auth (JWT) |
-|--------|-----------------|-------------|---------------------------|------------|
+| Module | Controller path | Số endpoint | Mounted `AppModule` | Auth (JWT) |
+|--------|-----------------|-------------|---------------------|------------|
 | **App** (root) | `/` | 1 | Có | Không |
-| **Auth** | `/auth` | 6 | Có | 2/6 (logout, me) |
+| **Auth** | `/auth` | 6 | Có | 2/6 (`logout`, `me`) |
 | **Users** | `/users` | 6 | Có | Tất cả |
-| **Peer Reviews** (trong UsersModule) | `/users/:id/reviews` | 2 | Có | Tất cả |
+| **Peer Reviews** | `/users/:id/reviews` | 2 | Có (UsersModule) | Tất cả |
+| **Matching** | `/matching` | 4 | Có | Tất cả |
 | **Invitation Queue** | `/invitation-queue` | 10 | Có | Tất cả |
-| **Drinking Sessions** | `/drinking-sessions` | 1 | **Không** (mock, chưa import) | Swagger ghi Bearer nhưng **chưa gắn Guard** |
-| Chat / Matchmaking / Notifications / Safe-ride | — | 0 | Chưa có HTTP | — |
+| **Drinking Sessions** | `/drinking-sessions` | 1 | **Không** (mock, controller không đăng ký) | Swagger Bearer; **chưa `@UseGuards`** |
+| Chat / Notifications / Safe-ride / Friends / Monetization | — | 0 | Chưa có HTTP | — |
 
-**Tổng endpoint đã định nghĩa trong code:** **26**  
-**Tổng endpoint đang serve khi app chạy:** **25** (trừ `POST /drinking-sessions` vì module chưa mount)
+| | Số lượng |
+|--|----------|
+| Endpoint **định nghĩa** trong code | **30** |
+| Endpoint **serve khi app chạy** | **29** (trừ `POST /drinking-sessions`) |
+
+**Modules mount trong `src/app.module.ts`:** `AuthModule`, `UsersModule`, `InvitationQueueModule`, `MatchingModule` (+ shared config/mongoose/queue/throttler).
 
 ### 1.2. Convention chung
 
 | Mục | Mô tả |
 |-----|--------|
-| Global prefix | `api` → mọi route HTTP = `/api/...` |
-| Content-Type | `application/json` (request body) |
+| Global prefix | `api` → route HTTP = `/api/...` |
+| Content-Type | `application/json` (body) |
 | Auth header | `Authorization: Bearer <accessToken>` |
-| Validation | Global `ValidationPipe`: `whitelist`, `forbidNonWhitelisted`, `transform` |
+| Validation | Global `ValidationPipe`: `whitelist`, `forbidNonWhitelisted`, `transform`, `enableImplicitConversion` |
 | Success envelope | Global `ResponseInterceptor` |
 | Error envelope | Global `AllExceptionsFilter` |
+| CORS | Reflect origin hoặc list `CORS_ORIGIN`; credentials bật |
 
 ### 1.3. Success response (chuẩn)
-
-Mọi handler **success** được bọc:
 
 ```json
 {
@@ -51,13 +69,13 @@ Mọi handler **success** được bọc:
 
 | Field | Type | Bắt buộc | Mô tả |
 |-------|------|----------|--------|
-| `success` | `boolean` | Có | Luôn `true` khi HTTP 2xx qua interceptor |
-| `data` | `any` | Có | Payload nghiệp vụ (object, array, string, null) |
-| `message` | `string` | Không | Chỉ khi handler trả wrapper có `message` |
-| `meta` | `object` | Không | Pagination (`items` + `meta`) |
+| `success` | `boolean` | Có | `true` khi HTTP 2xx qua interceptor |
+| `data` | `any` | Có | Payload nghiệp vụ |
+| `message` | `string` | Không | Khi handler trả wrapper có `message` |
+| `meta` | `object` | Không | Pagination / metadata |
 | `timestamp` | `string` (ISO) | Có | Thời điểm response |
 
-> **Lưu ý double-wrap:** Nếu controller tự return `{ success, data }`, interceptor có thể “bóc” field `data` khi object có ≤ 2 key và có property `data`. Các endpoint Auth/Users thường return plain object/DTO → nằm gọn trong `data`.
+> **Lưu ý:** Controller nên return plain object/DTO. Nếu return `{ success, data }` với ≤2 key, interceptor có thể bóc `data` (tránh double-wrap). `DELETE` 204 thường không body.
 
 ### 1.4. Error response (chuẩn)
 
@@ -78,1061 +96,499 @@ Mọi handler **success** được bọc:
 |-------|------|--------|
 | `success` | `boolean` | Luôn `false` |
 | `error.code` | `string` | `UPPER_SNAKE_CASE` |
-| `error.message` | `string` | Mô tả lỗi |
-| `error.details` | `any` | Optional (validation, keyValue, …) |
+| `error.message` | `string` | Mô tả |
+| `error.details` | `any` | Optional |
 | `timestamp` | `string` | ISO |
 | `path` | `string` | URL request |
 
-**Production:** HTTP ≥ 500 → client chỉ nhận message generic, không lộ chi tiết nội bộ.
+**Production:** HTTP ≥ 500 → message generic, không lộ stack.
 
-### 1.5. Mã lỗi thường gặp
+### 1.5. Enums dùng chung
+
+**AlcoholToleranceLevel**
+
+| Value | Ý nghĩa (product) |
+|-------|-------------------|
+| `LEVEL_1` | Nếm Bọt |
+| `LEVEL_2` | Vui Vẻ |
+| `LEVEL_3` | Chiến Thần |
+| `LEVEL_4` | Bất Tử |
+
+**MatchingMode**
+
+| Value |
+|-------|
+| `CASUAL` · `NETWORKING` · `GIAI_SAU` · `DEBATE` · `UONG_DAM` |
+
+### 1.6. Mã lỗi thường gặp
 
 | HTTP | `error.code` | Khi nào |
 |------|--------------|---------|
 | 400 | `VALIDATION_ERROR` | Body/query sai class-validator |
-| 400 | `INVALID_DATA_TYPE` | Mongo `CastError` (vd. id sai) |
-| 400 | `INVALID_INVITEES` / `NOT_YOUR_TURN` | Queue invitee list / không đúng lượt |
-| 401 | `UNAUTHORIZED` / `INVALID_CREDENTIALS` / `INVALID_TOKEN` / `USER_NOT_FOUND` | Auth / JWT |
+| 400 | `INVALID_DATA_TYPE` | Mongo `CastError` |
+| 400 | `INVALID_INVITEES` / `NOT_YOUR_TURN` / `INVALID_CANDIDATE` / `INVALID_PREFERRED_MODES` / … | Nghiệp vụ matching/queue |
+| 401 | `UNAUTHORIZED` / `INVALID_CREDENTIALS` / `INVALID_TOKEN` | Auth / JWT |
 | 401 | `INVALID_REFRESH_TOKEN` / `REFRESH_TOKEN_EXPIRED` / `TOKEN_REUSE_DETECTED` | Refresh |
-| 403 | `FORBIDDEN_QUEUE_ACCESS` | Không phải host/participant / host-only action |
-| 404 | `USER_NOT_FOUND` / `NOT_FOUND` / `QUEUE_NOT_FOUND` / `INVITATION_NOT_FOUND` | Resource không tồn tại / ẩn |
-| 409 | `EMAIL_ALREADY_EXISTS` / `CONFLICT` / `ALREADY_HAS_ACTIVE_QUEUE` / `QUEUE_NOT_ACTIVE` | Conflict nghiệp vụ |
-| 429 | `RATE_LIMIT_EXCEEDED` | Throttle create/respond queue (và global) |
+| 403 | `FORBIDDEN_QUEUE_ACCESS` | Queue host/participant |
+| 404 | `USER_NOT_FOUND` / `NOT_FOUND` / `QUEUE_NOT_FOUND` / `INVITATION_NOT_FOUND` | Resource / ẩn profile |
+| 409 | `EMAIL_ALREADY_EXISTS` / `ALREADY_HAS_ACTIVE_QUEUE` / `QUEUE_NOT_ACTIVE` | Conflict |
+| 429 | `RATE_LIMIT_EXCEEDED` | Throttle |
 | 501 | `GOOGLE_AUTH_DISABLED` | Google login tắt |
-| 500 | `INTERNAL_SERVER_ERROR` / `REGISTRATION_FAILED` / `QUEUE_CREATE_FAILED` / `QUEUE_ERROR` | Lỗi hệ thống / BullMQ |
+| 500 | `INTERNAL_SERVER_ERROR` / `REGISTRATION_FAILED` / `QUEUE_CREATE_FAILED` | Hệ thống |
+
+### 1.7. Rate limits (endpoint-level)
+
+| Endpoint | Limit |
+|----------|--------|
+| `POST /api/invitation-queue` | 10 / giờ / user |
+| `POST /api/invitation-queue/:queueId/respond` | 30 / phút / user |
+| `POST /api/matching/candidates` | 30 / phút / user |
+| `POST /api/matching/score` | 60 / phút / user |
+
+(Ngoài ra có throttler global nếu cấu hình trong `RateLimiterModule`.)
 
 ---
 
 ## 2. Module: App (root)
 
 **File:** `src/app.controller.ts`  
-**Base path:** `/api`
+**Base:** `/api`
 
 ### 2.1. `GET /api`
 
 | | |
 |--|--|
-| **Mô tả** | Health / hello mặc định Nest |
+| **Mô tả** | Health / hello |
 | **Auth** | Không |
-| **Request** | Không body, không query |
-| **HTTP status** | `200` |
-
-**Response `data`:**
-
-```json
-"Hello World!"
-```
-
-**Ví dụ full:**
-
-```json
-{
-  "success": true,
-  "data": "Hello World!",
-  "timestamp": "2026-07-16T10:00:00.000Z"
-}
-```
+| **Status** | `200` |
+| **`data`** | `"Hello World!"` |
 
 ---
 
 ## 3. Module: Auth
 
 **File:** `src/modules/auth/presentation/http/auth.controller.ts`  
-**Base path:** `/api/auth`  
-**Mounted:** Có (`AuthModule`)
+**Base:** `/api/auth`  
+**Mounted:** Có
 
-### Thống kê Auth
+### Thống kê
 
-| Method | Path | Auth | Status success | Ghi chú |
-|--------|------|------|----------------|---------|
-| `POST` | `/api/auth/register` | Không | `201` (Nest default POST) | Tạo user + tokens |
-| `POST` | `/api/auth/login` | Không | `200` | |
-| `POST` | `/api/auth/refresh` | Không | `200` | Rotation + reuse detection |
-| `POST` | `/api/auth/google` | Không | — | Mặc định **501** (disabled) |
-| `POST` | `/api/auth/logout` | JWT | `200` | Optional body refreshToken |
-| `GET` | `/api/auth/me` | JWT | `200` | Payload JWT đã validate |
-
----
+| Method | Path | Auth | Status | Mô tả |
+|--------|------|------|--------|--------|
+| `POST` | `/api/auth/register` | Không | `201` | Đăng ký + tokens |
+| `POST` | `/api/auth/login` | Không | `200` | Đăng nhập |
+| `POST` | `/api/auth/refresh` | Không | `200` | Đổi access bằng refresh |
+| `POST` | `/api/auth/google` | Không | `200` / `501` | Google OAuth (thường disabled) |
+| `POST` | `/api/auth/logout` | JWT | `200` | Logout (revoke refresh optional) |
+| `GET` | `/api/auth/me` | JWT | `200` | Payload JWT hiện tại (`id`, `email`, `name`, …) |
 
 ### 3.1. `POST /api/auth/register`
 
-| | |
-|--|--|
-| **Mô tả** | Đăng ký tài khoản (CreateUser + AuthAccount + tokens) |
-| **Auth** | Không |
+**Body**
 
-**Request body**
+| Field | Type | Rule |
+|-------|------|------|
+| `name` | string | required |
+| `email` | string | email |
+| `password` | string | min **8** |
 
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| `name` | `string` | Có | non-empty |
-| `email` | `string` | Có | email |
-| `password` | `string` | Có | min **8** ký tự |
-
-```json
-{
-  "name": "Nguyen Van A",
-  "email": "a@example.com",
-  "password": "secret123"
-}
-```
-
-**Response `data` (success)**
-
-| Field | Type | Mô tả |
-|-------|------|--------|
-| `user.id` | `string` | User id |
-| `user.name` | `string` | |
-| `user.email` | `string` | |
-| `accessToken` | `string` | JWT access |
-| `refreshToken` | `string` | Dạng `{userId}:{randomHex}` |
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "664f1a2b3c4d5e6f7a8b9c0d",
-      "name": "Nguyen Van A",
-      "email": "a@example.com"
-    },
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "664f1a2b3c4d5e6f7a8b9c0d:a1b2c3..."
-  },
-  "timestamp": "2026-07-16T10:00:00.000Z"
-}
-```
-
-**Lỗi tiêu biểu:** `409 EMAIL_ALREADY_EXISTS`, `400 VALIDATION_ERROR`, `500 REGISTRATION_FAILED`
-
----
+**`data` (typical):** `{ user, accessToken, refreshToken }` (shape từ use case register).
 
 ### 3.2. `POST /api/auth/login`
 
-| | |
-|--|--|
-| **Mô tả** | Đăng nhập email/password |
-| **Auth** | Không |
-| **HTTP** | `200` |
-
-**Request body**
-
-| Field | Type | Required |
-|-------|------|----------|
-| `email` | `string` (email) | Có |
-| `password` | `string` | Có |
-
-```json
-{
-  "email": "a@example.com",
-  "password": "secret123"
-}
-```
-
-**Response `data`:** cùng shape register (`user` + `accessToken` + `refreshToken`).
-
-**Lỗi tiêu biểu:** `401 INVALID_CREDENTIALS` (sai email/password hoặc user soft-deleted)
-
----
+**Body:** `{ email, password }`  
+**`data`:** tokens + user info tương tự login use case.
 
 ### 3.3. `POST /api/auth/refresh`
 
-| | |
-|--|--|
-| **Mô tả** | Đổi access token; rotate refresh; phát hiện reuse |
-| **Auth** | Không (dùng refresh token trong body) |
-| **HTTP** | `200` |
-
-**Request body**
-
-| Field | Type | Required |
-|-------|------|----------|
-| `refreshToken` | `string` | Có |
-
-```json
-{
-  "refreshToken": "664f1a2b3c4d5e6f7a8b9c0d:a1b2c3..."
-}
-```
-
-**Response `data`**
-
-```json
-{
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "664f1a2b3c4d5e6f7a8b9c0d:newraw..."
-}
-```
-
-**Lỗi tiêu biểu:**  
-`INVALID_REFRESH_TOKEN`, `REFRESH_TOKEN_EXPIRED`, `TOKEN_REUSE_DETECTED` (revoke all sessions), `USER_NOT_FOUND`
-
----
+**Body:** `{ refreshToken: string }`  
+**`data`:** cặp token mới.
 
 ### 3.4. `POST /api/auth/google`
 
-| | |
-|--|--|
-| **Mô tả** | Google login (chưa implement; feature flag) |
-| **Auth** | Không |
-| **HTTP** | `501` khi `GOOGLE_AUTH_ENABLED=false` (mặc định) |
-
-**Request body**
-
-| Field | Type | Required |
-|-------|------|----------|
-| `token` | `string` | Có (Google ID token — khi bật) |
-
-```json
-{
-  "token": "google-id-token-here"
-}
-```
-
-**Response lỗi (default):**
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "GOOGLE_AUTH_DISABLED",
-    "message": "Google login is not enabled. Set GOOGLE_AUTH_ENABLED=true when ready."
-  },
-  "timestamp": "...",
-  "path": "/api/auth/google"
-}
-```
-
-Nếu bật flag nhưng chưa code xong → `NOT_IMPLEMENTED`.
-
----
+**Body:** theo `GoogleLoginDto` (id token / credential).  
+Mặc định có thể trả **501** `GOOGLE_AUTH_DISABLED`.
 
 ### 3.5. `POST /api/auth/logout`
 
-| | |
-|--|--|
-| **Mô tả** | Revoke 1 refresh token (nếu gửi) hoặc revoke **tất cả** session |
-| **Auth** | JWT bắt buộc |
-| **HTTP** | `200` |
-
-**Headers**
-
-```http
-Authorization: Bearer <accessToken>
-```
-
-**Request body (optional)**
-
-| Field | Type | Required |
-|-------|------|----------|
-| `refreshToken` | `string` | Không |
-
-```json
-{
-  "refreshToken": "664f...:raw..."
-}
-```
-
-**Response `data`**
-
-```json
-{
-  "success": true
-}
-```
-
-> Sau interceptor, client thấy `data.success === true` (payload use-case nằm trong `data`).
-
----
+**Auth:** JWT  
+**Body (optional):** `{ refreshToken?: string }`  
+**`data`:** kết quả logout use case.
 
 ### 3.6. `GET /api/auth/me`
 
-| | |
-|--|--|
-| **Mô tả** | User từ JWT strategy (đã load DB, chặn soft-deleted) |
-| **Auth** | JWT |
-| **HTTP** | `200` |
-
-**Request:** không body.
-
-**Response `data`**
-
-| Field | Type |
-|-------|------|
-| `id` | `string` |
-| `email` | `string` |
-| `name` | `string` |
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "664f1a2b3c4d5e6f7a8b9c0d",
-    "email": "a@example.com",
-    "name": "Nguyen Van A"
-  },
-  "timestamp": "..."
-}
-```
-
-> Khác `GET /api/users/me`: endpoint này **không** trả full profile (drunk profile, privacy, stats).
+**Auth:** JWT  
+**`data`:** object user từ JWT strategy (không full profile DB — dùng `GET /users/me` cho profile đầy đủ).
 
 ---
 
 ## 4. Module: Users
 
-**Files:**  
-
-- `src/modules/users/presentation/http/users.controller.ts`  
-- `src/modules/users/presentation/http/peer-reviews.controller.ts`  
-
-**Base path:** `/api/users`  
-**Auth:** JWT trên **tất cả** route  
+**File:** `src/modules/users/presentation/http/users.controller.ts`  
+**Base:** `/api/users`  
+**Auth:** JWT (toàn controller)  
 **Mounted:** Có
 
-### Thống kê Users + Reviews
+### Thống kê
 
-| Method | Path | Mô tả ngắn |
-|--------|------|------------|
-| `GET` | `/api/users/me` | Full profile owner |
-| `PATCH` | `/api/users/me` | Cập nhật name/phone/avatar/bio |
-| `PATCH` | `/api/users/me/drunk-profile` | Cập nhật hồ sơ LiquidNetwork |
-| `PATCH` | `/api/users/me/privacy` | Cập nhật privacy |
-| `PATCH` | `/api/users/me/tolerance-level` | Cập nhật level |
-| `GET` | `/api/users/:id` | Profile theo id (privacy) |
-| `POST` | `/api/users/:id/reviews` | Tạo peer review |
-| `GET` | `/api/users/:id/reviews` | List reviews (privacy) |
+| Method | Path | Mô tả |
+|--------|------|--------|
+| `GET` | `/api/users/me` | Profile owner (có email, privacy, level) |
+| `PATCH` | `/api/users/me` | Cập nhật basic: name, phone, avatar, bio |
+| `PATCH` | `/api/users/me/drunk-profile` | occupation, education, selfIntroduction |
+| `PATCH` | `/api/users/me/privacy` | hideProfile, hideLevel |
+| `PATCH` | `/api/users/me/tolerance-level` | `level`: AlcoholToleranceLevel |
+| `GET` | `/api/users/:id` | Public profile (privacy: ẩn profile → 404; ẩn level → omit level) |
 
-### Enum dùng chung
+### 4.1. User response shape (`UserResponseDto`)
 
-`alcoholToleranceLevel` / `level`:
+| Field | Owner | Public (other) |
+|-------|-------|----------------|
+| `id`, `name`, `phone?`, `avatar?`, `bio?` | ✓ | ✓ |
+| `drunkProfile` | ✓ | ✓ |
+| `sessionsJoined`, `invitationAcceptRate`, `averageRating`, `totalReviews` | ✓ | ✓ |
+| `email` | ✓ | ✗ |
+| `privacySettings` | ✓ | ✗ |
+| `alcoholToleranceLevel` | ✓ | Chỉ nếu `!hideLevel` |
 
-| Value | Ý nghĩa (domain) |
-|-------|------------------|
-| `LEVEL_1` | Thấp |
-| `LEVEL_2` | Trung bình |
-| `LEVEL_3` | Cao |
-| `LEVEL_4` | Rất cao |
+### 4.2. Request bodies
 
-### Shape `UserResponseDto`
-
-**Owner** (`isOwner: true` — `/me` và patch `/me/*`, hoặc `GET /:id` khi tự xem):
-
-| Field | Type | Ghi chú |
-|-------|------|---------|
-| `id` | `string` | |
-| `name` | `string` | |
-| `email` | `string` | Chỉ owner |
-| `phone` | `string?` | |
-| `avatar` | `string?` | |
-| `bio` | `string?` | |
-| `drunkProfile` | `object` | `{ occupation?, education?, selfIntroduction? }` |
-| `alcoholToleranceLevel` | `string` | Enum |
-| `privacySettings` | `object` | Chỉ owner — `{ hideProfile, hideLevel }` |
-| `sessionsJoined` | `number` | |
-| `invitationAcceptRate` | `number` | 0–100 |
-| `averageRating` | `number` | |
-| `totalReviews` | `number` | |
-
-**Public** (non-owner, profile không ẩn):
-
-- **Không** có `email`, **không** có `privacySettings`
-- `alcoholToleranceLevel` **bị omit** nếu target `hideLevel === true`
-
----
-
-### 4.1. `GET /api/users/me`
-
-| | |
-|--|--|
-| **Auth** | JWT |
-| **Request** | Không body |
-| **HTTP** | `200` |
-
-**Response `data`:** full owner `UserResponseDto` (có `email`, `privacySettings`, level).
-
----
-
-### 4.2. `PATCH /api/users/me`
-
-| | |
-|--|--|
-| **Auth** | JWT |
-| **HTTP** | `200` |
-
-**Request body** (tất cả optional; whitelist)
-
-| Field | Type |
-|-------|------|
-| `name` | `string?` |
-| `phone` | `string?` |
-| `avatar` | `string?` |
-| `bio` | `string?` |
+**`PATCH /me`**
 
 ```json
-{
-  "name": "Nguyen Van B",
-  "bio": "Hello LiquidNetwork"
-}
+{ "name?": "...", "phone?": "...", "avatar?": "...", "bio?": "..." }
 ```
 
-**Response `data`:** owner `UserResponseDto` sau update.
-
----
-
-### 4.3. `PATCH /api/users/me/drunk-profile`
-
-| | |
-|--|--|
-| **Auth** | JWT |
-| **HTTP** | `200` |
-
-**Request body** (nested bắt buộc key `drunkProfile`)
-
-| Field | Type | Required |
-|-------|------|----------|
-| `drunkProfile` | `object` | Có |
-| `drunkProfile.occupation` | `string?` | Không |
-| `drunkProfile.education` | `string?` | Không |
-| `drunkProfile.selfIntroduction` | `string?` | Không |
+**`PATCH /me/drunk-profile`**
 
 ```json
 {
   "drunkProfile": {
-    "occupation": "Engineer",
-    "education": "BKU",
-    "selfIntroduction": "Thích networking"
+    "occupation?": "...",
+    "education?": "...",
+    "selfIntroduction?": "..."
   }
 }
 ```
 
-**Response `data`:** owner `UserResponseDto` (merge partial fields).
-
----
-
-### 4.4. `PATCH /api/users/me/privacy`
-
-| | |
-|--|--|
-| **Auth** | JWT |
-| **HTTP** | `200` |
-
-**Request body**
-
-| Field | Type | Required |
-|-------|------|----------|
-| `privacySettings` | `object` | Có |
-| `privacySettings.hideProfile` | `boolean?` | Không |
-| `privacySettings.hideLevel` | `boolean?` | Không |
+**`PATCH /me/privacy`**
 
 ```json
 {
   "privacySettings": {
-    "hideProfile": true,
-    "hideLevel": false
+    "hideProfile?": false,
+    "hideLevel?": false
   }
 }
 ```
 
-**Response `data`:** owner `UserResponseDto`.
-
----
-
-### 4.5. `PATCH /api/users/me/tolerance-level`
-
-| | |
-|--|--|
-| **Auth** | JWT |
-| **HTTP** | `200` |
-
-**Request body**
-
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| `level` | `string` | Có | Enum `LEVEL_1` … `LEVEL_4` |
+**`PATCH /me/tolerance-level`**
 
 ```json
-{
-  "level": "LEVEL_2"
-}
+{ "level": "LEVEL_2" }
 ```
 
-**Response `data`:** owner `UserResponseDto`.
-
 ---
 
-### 4.6. `GET /api/users/:id`
+## 5. Module: Peer Reviews
 
-| | |
-|--|--|
-| **Auth** | JWT |
-| **Path param** | `id` — Mongo user id |
-| **HTTP** | `200` hoặc `404` |
+**File:** `src/modules/users/presentation/http/peer-reviews.controller.ts`  
+**Base:** `/api/users/:id/reviews`  
+**Auth:** JWT  
+**Mounted:** Có (UsersModule)
 
-**Request:** không body.
+| Method | Path | Mô tả |
+|--------|------|--------|
+| `POST` | `/api/users/:id/reviews` | Tạo review cho user `:id` (reviewee = path) |
+| `GET` | `/api/users/:id/reviews` | List reviews (respect hideProfile) |
 
-**Response `data`:**
+### 5.1. `POST` body
 
-- Owner (`id === requester`): full DTO như `/me`
-- Public: không `email` / `privacySettings`; level tùy `hideLevel`
+| Field | Type | Rule |
+|-------|------|------|
+| `sessionId` | string | required (string tự do — sessions module chưa thật) |
+| `rating` | number | 1–5 |
+| `comment` | string? | optional |
 
-**Lỗi:**
-
-| Code | Khi |
-|------|-----|
-| `USER_NOT_FOUND` / `NOT_FOUND` | User không tồn tại, soft-deleted, hoặc **hideProfile** với non-owner |
-
----
-
-### 4.7. `POST /api/users/:id/reviews`
-
-| | |
-|--|--|
-| **Mô tả** | Tạo peer review cho user `:id` (reviewee) |
-| **Auth** | JWT (reviewer = current user) |
-| **Path** | `id` = revieweeId |
-| **HTTP** | `201` (default POST) |
-
-**Request body** (`CreatePeerReviewBodyDto`)
-
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| `sessionId` | `string` | Có | non-empty string |
-| `rating` | `number` | Có | 1–5 |
-| `comment` | `string?` | Không | |
+### 5.2. Review response
 
 ```json
 {
-  "sessionId": "session-abc-123",
+  "id": "...",
+  "reviewerId": "...",
+  "revieweeId": "...",
+  "sessionId": "...",
   "rating": 5,
-  "comment": "Good vibe"
+  "comment": "...",
+  "createdAt": "..."
 }
 ```
-
-**Response `data` (`PeerReviewResponseDto`)**
-
-| Field | Type |
-|-------|------|
-| `id` | `string` |
-| `reviewerId` | `string` |
-| `revieweeId` | `string` |
-| `sessionId` | `string` |
-| `rating` | `number` |
-| `comment` | `string?` |
-| `createdAt` | `string` / `Date`? |
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "6650...",
-    "reviewerId": "664f...",
-    "revieweeId": "664e...",
-    "sessionId": "session-abc-123",
-    "rating": 5,
-    "comment": "Good vibe",
-    "createdAt": "2026-07-16T10:00:00.000Z"
-  },
-  "timestamp": "..."
-}
-```
-
-**Lỗi tiêu biểu:**
-
-| Code / HTTP | Khi |
-|-------------|-----|
-| `VALIDATION_ERROR` | Thiếu/sai field body |
-| Conflict self-review | reviewer === reviewee |
-| `NOT_FOUND` | Reviewee không tồn tại |
-| Conflict duplicate | Đã review cùng `sessionId` |
-
-> **Chưa verify:** `sessionId` có tồn tại session thật hay reviewer đã tham gia (Sessions module chưa có).
-
-**Side effect:** cập nhật `averageRating`, `totalReviews` của reviewee.
 
 ---
 
-### 4.8. `GET /api/users/:id/reviews`
+## 6. Module: Matching
 
-| | |
-|--|--|
-| **Mô tả** | Danh sách peer reviews của user |
-| **Auth** | JWT |
-| **HTTP** | `200` |
+**Files:**  
 
-**Request:** không body, **chưa có** query pagination.
+- Controller: `src/modules/matching/presentation/http/matching.controller.ts`  
+- README: `src/modules/matching/README.md`  
+**Base:** `/api/matching`  
+**Auth:** JWT (toàn controller)  
+**Mounted:** Có (`MatchingModule`)
 
-**Response `data`:** `PeerReviewResponseDto[]`
+### Mục tiêu Phase 1
+
+Sinh danh sách ứng viên **đã score + rank** để FE đưa vào Invitation Queue (`inviteeIds`).  
+**Không** auto-create queue. **Không** filter geo (User chưa có location).
+
+### Thống kê
+
+| Method | Path | Rate limit | Mô tả |
+|--------|------|------------|--------|
+| `POST` | `/api/matching/candidates` | 30/phút | Generate ranked list |
+| `POST` | `/api/matching/score` | 60/phút | Score 1-1 |
+| `GET` | `/api/matching/preferences` | — | Prefs (default nếu chưa lưu) |
+| `PUT` | `/api/matching/preferences` | — | Upsert prefs |
+
+### Score formula (Phase 1)
+
+```
+Score (0–100) =
+  LevelScore      * 0.40 +
+  ModeScore       * 0.20 +
+  ReputationScore * 0.20 +
+  ActivityScore   * 0.10 +
+  OccupationScore * 0.10
+```
+
+| Component | Nguồn |
+|-----------|--------|
+| Level | `alcoholToleranceLevel` (gap 0–3) |
+| Mode | base 1.0 Phase 1 |
+| Reputation | `averageRating` + `totalReviews` (cold-start) |
+| Activity | `updatedAt` decay |
+| Occupation | chỉ khi `mode=NETWORKING` + có preferred occupations |
+
+**Pool:** max 200 user pre-filter → top N (default/max 20).  
+**History fallback:** nếu exclude history làm pool &lt; 50% `limit` → retry không history; `historyFallbackApplied: true`.
+
+### 6.1. `POST /api/matching/candidates`
+
+**Body (all optional trừ khi cần override)**
+
+| Field | Type | Rule |
+|-------|------|------|
+| `mode` | MatchingMode | |
+| `preferredAlcoholLevels` | AlcoholToleranceLevel[] | max 4 |
+| `preferredOccupations` | string[] | max 10, mỗi ≤80 |
+| `excludeUserIds` | MongoId[] | max 100 |
+| `limit` | int | 1–20 |
+| `excludeRecentDays` | int | 0–90 |
+
+**`data`**
 
 ```json
 {
-  "success": true,
-  "data": [
+  "mode": "CASUAL",
+  "totalScored": 42,
+  "historyFallbackApplied": false,
+  "candidates": [
     {
-      "id": "6650...",
-      "reviewerId": "664f...",
-      "revieweeId": "664e...",
-      "sessionId": "session-abc-123",
-      "rating": 5,
-      "comment": "Good vibe",
-      "createdAt": "2026-07-16T10:00:00.000Z"
+      "id": "...",
+      "name": "...",
+      "avatar": "...",
+      "alcoholToleranceLevel": "LEVEL_2",
+      "occupation": "Engineer",
+      "score": 87.5,
+      "breakdown": {
+        "level": 100,
+        "mode": 100,
+        "reputation": 80,
+        "activity": 100,
+        "occupation": 100
+      }
     }
-  ],
-  "timestamp": "..."
-}
-```
-
-**Privacy:** non-owner + target `hideProfile` → `404 USER_NOT_FOUND` (giống profile). Owner luôn xem được.
-
----
-
-## 5. Module: Drinking Sessions (mock — chưa mount)
-
-**File:** `src/modules/drinking-sessions/drinking-sessions.controller.ts`  
-**Base path (dự kiến):** `/api/drinking-sessions`  
-**Trạng thái:** Controller + DTO có sẵn; **`DrinkingSessionsModule` không import trong `AppModule`** → **không serve** khi chạy app.  
-**Auth code:** Swagger `@ApiBearerAuth` nhưng **không** có `@UseGuards(JwtAuthGuard)`.  
-**Logic:** return mock, không ghi DB.
-
-### 5.1. `POST /api/drinking-sessions` *(khi mount)*
-
-**Request body** (`CreateDrinkingSessionDto`)
-
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| `title` | `string` | Có | non-empty |
-| `location` | `string` | Có | non-empty |
-| `maxParticipants` | `number` | Có | 1–20 |
-| `startTime` | `string` | Có | ISO date string |
-| `note` | `string?` | Không | |
-
-```json
-{
-  "title": "Friday Hangout",
-  "location": "123 Nguyen Hue, Q1, HCMC",
-  "maxParticipants": 5,
-  "startTime": "2026-07-20T19:00:00Z",
-  "note": "BYO snacks"
-}
-```
-
-**Response mock (handler return):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "mock-id",
-    "title": "Friday Hangout",
-    "location": "123 Nguyen Hue, Q1, HCMC",
-    "maxParticipants": 5,
-    "startTime": "2026-07-20T19:00:00Z",
-    "note": "BYO snacks",
-    "status": "SCHEDULED"
-  }
-}
-```
-
-> Khi bật interceptor + mount: client nhận envelope chuẩn với `data` là object session mock (interceptor có thể bóc `data` nếu raw return đã có `{ success, data }`).
-
----
-
-## 6. Module: Invitation Queue
-
-**File:** `src/modules/invitation-queue/presentation/http/invitation-queue.controller.ts`  
-**Base path:** `/api/invitation-queue`  
-**Mounted:** Có (`InvitationQueueModule`)  
-**Auth:** JWT bắt buộc trên **toàn controller**  
-**Background:** BullMQ queue name `invitation-timeout` (timeout per invitee → auto advance)
-
-### 6.0. Domain & state machine (tóm tắt)
-
-**Sequential Invite Queue:** host mời theo thứ tự ưu tiên; mỗi lượt có cửa sổ `timeoutSeconds`; reject/timeout → advance; accept → `matched` và dừng.
-
-| Queue `status` | Ý nghĩa |
-|----------------|---------|
-| `draft` | Dự phòng (create hiện tại start thẳng `active`) |
-| `active` | Đang mời tuần tự |
-| `matched` | Có ít nhất 1 accept (thường dừng ngay khi accept) |
-| `completed` | Hết list, không ai accept |
-| `cancelled` | Host hủy |
-
-| Participant `status` | Ý nghĩa |
-|----------------------|---------|
-| `pending` | Chưa tới lượt |
-| `active` | Đang là head / current invitee |
-| `accepted` | Đồng ý |
-| `rejected` | Từ chối |
-| `timeout` | Hết giờ không trả lời |
-| `skipped` | Bị bỏ khi queue cancel |
-
-| Invitation `status` (flat history) | Ý nghĩa |
-|------------------------------------|---------|
-| `pending` \| `accepted` \| `rejected` \| `timeout` \| `cancelled` | Bản ghi lịch sử 1-1 host→invitee |
-
-**Chuyển trạng thái chính**
-
-```text
-CREATE  → status=active, participants[0]=active, schedule BullMQ delay=timeoutSeconds
-RESPOND accept  → p[i]=accepted, queue=matched, cancel job
-RESPOND reject  → p[i]=rejected → ADVANCE
-TIMEOUT (job)   → p[i]=timeout → ADVANCE  (idempotent via generation)
-ADVANCE         → next pending = active + new expiresAt + job
-                → no pending → matched (if any accepted) else completed
-CANCEL (host)   → cancelled; pending|active → skipped; pending invites → cancelled
-```
-
-**Quy tắc**
-
-| Rule | Chi tiết |
-|------|----------|
-| Host | 1 queue `active` tại một thời điểm |
-| Invitees | ≥1, ≤20, MongoId, unique, ≠ host, user tồn tại, không `hideProfile` |
-| `timeoutSeconds` | 15–600 (giây) |
-| Respond | Chỉ user = current invitee (`participants[currentIndex]`, status `active`) |
-| Cancel / DELETE | Chỉ host |
-| Get by id | Host **hoặc** participant |
-| Realtime | Chưa Socket.io — FE poll `expiresAt` / detail |
-
-### Thống kê Invitation Queue
-
-| Method | Path | Auth | Rate limit | Ghi chú |
-|--------|------|------|------------|---------|
-| `POST` | `/api/invitation-queue` | JWT | **10 / giờ / user** | Tạo + start #1 |
-| `GET` | `/api/invitation-queue/me` | JWT | — | Active queue của **host** hoặc `null` |
-| `GET` | `/api/invitation-queue/history` | JWT | — | `?page&limit` optional |
-| `GET` | `/api/invitation-queue/candidates` | JWT | — | `?q=` search |
-| `GET` | `/api/invitation-queue/candidates/suggestions` | JWT | — | Gợi ý ngắn |
-| `GET` | `/api/invitation-queue/invitations/:invitationId` | JWT | — | Flat invitation |
-| `GET` | `/api/invitation-queue/:queueId` | JWT | — | Host hoặc participant |
-| `POST` | `/api/invitation-queue/:queueId/respond` | JWT | **30 / phút / user** | Current invitee only |
-| `POST` | `/api/invitation-queue/:queueId/cancel` | JWT | — | Host only |
-| `DELETE` | `/api/invitation-queue/:queueId` | JWT | — | Host only (= cancel), HTTP **204** body null |
-
-> **Thứ tự route:** static (`me`, `history`, `candidates`, `invitations/...`) **trước** `:queueId`.
-
----
-
-### 6.1. Shared shapes
-
-#### `InvitationQueue` (`data`)
-
-| Field | Type | Mô tả |
-|-------|------|--------|
-| `id` | `string` | Queue id |
-| `hostId` | `string` | |
-| `hostName` | `string` | Snapshot lúc create |
-| `hostAvatar` | `string?` | |
-| `title` | `string?` | |
-| `message` | `string?` | |
-| `status` | `string` | Xem bảng status |
-| `timeoutSeconds` | `number` | Cửa sổ mỗi lượt |
-| `currentIndex` | `number` | Index participant đang active |
-| `participants` | `QueueParticipant[]` | Ordered |
-| `expiresAt` | `string \| null` | ISO hết hạn lượt hiện tại |
-| `createdAt` | `string` | ISO |
-| `updatedAt` | `string?` | ISO |
-| `completedAt` | `string \| null` | ISO khi terminal |
-
-> Field nội bộ `generation` **không** expose ra client.
-
-#### `QueueParticipant`
-
-| Field | Type |
-|-------|------|
-| `userId` | `string` |
-| `name` | `string` |
-| `avatar` | `string?` |
-| `alcoholToleranceLevel` | `string?` |
-| `occupation` | `string?` |
-| `order` | `number` |
-| `status` | `string` |
-| `invitedAt` | `string \| null` |
-| `respondedAt` | `string \| null` |
-
-#### `Invitation` (flat)
-
-| Field | Type |
-|-------|------|
-| `id` | `string` |
-| `queueId` | `string` |
-| `fromUserId` / `fromUserName` / `fromUserAvatar?` | |
-| `toUserId` / `toUserName` / `toUserAvatar?` | |
-| `status` | `string` |
-| `message` | `string?` |
-| `timeoutSeconds` | `number` |
-| `expiresAt` | `string \| null` |
-| `createdAt` | `string` |
-| `respondedAt` | `string \| null` |
-| `direction` | `"sent" \| "received"?` | Gán theo requester |
-
-#### `QueueUserRef` (candidates)
-
-| Field | Type |
-|-------|------|
-| `id` | `string` |
-| `name` | `string` |
-| `avatar` | `string?` |
-| `alcoholToleranceLevel` | `string?` |
-| `occupation` | `string?` |
-
----
-
-### 6.2. `POST /api/invitation-queue`
-
-| | |
-|--|--|
-| **Mô tả** | Tạo queue, kích hoạt invitee #1, schedule BullMQ timeout |
-| **Auth** | JWT (host = current user) |
-| **HTTP** | `201` (Nest default POST) / `200` tùy version — client nên chấp nhận 2xx |
-| **Throttle** | 10 requests / 3600s / user |
-
-**Request body**
-
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| `title` | `string` | Không | max 120 |
-| `message` | `string` | Không | max 500 |
-| `timeoutSeconds` | `number` | Có | int 15–600 |
-| `inviteeIds` | `string[]` | Có | min 1, max 20, mỗi phần tử MongoId |
-
-```json
-{
-  "title": "Tối nay bàn Sài Gòn",
-  "message": "Ai rảnh đi 1–2 tiếng không?",
-  "timeoutSeconds": 60,
-  "inviteeIds": [
-    "664f1a2b3c4d5e6f7a8b9c0d",
-    "664f1a2b3c4d5e6f7a8b9c0e"
   ]
 }
 ```
 
-**Response `data`:** `InvitationQueue` (status `active`, `currentIndex` = 0, participant[0] `active`).
+> `alcoholToleranceLevel` omit nếu candidate `hideLevel`.
 
-```json
-{
-  "success": true,
-  "data": {
-    "id": "664fabc...",
-    "hostId": "664fhost...",
-    "hostName": "Minh",
-    "title": "Tối nay bàn Sài Gòn",
-    "message": "Ai rảnh đi 1–2 tiếng không?",
-    "status": "active",
-    "timeoutSeconds": 60,
-    "currentIndex": 0,
-    "participants": [
-      {
-        "userId": "664f1a2b3c4d5e6f7a8b9c0d",
-        "name": "Lan",
-        "order": 0,
-        "status": "active",
-        "invitedAt": "2026-07-16T10:00:00.000Z",
-        "respondedAt": null
-      },
-      {
-        "userId": "664f1a2b3c4d5e6f7a8b9c0e",
-        "name": "Huy",
-        "order": 1,
-        "status": "pending",
-        "invitedAt": null,
-        "respondedAt": null
-      }
-    ],
-    "expiresAt": "2026-07-16T10:01:00.000Z",
-    "createdAt": "2026-07-16T10:00:00.000Z",
-    "completedAt": null
-  },
-  "timestamp": "2026-07-16T10:00:00.000Z"
-}
+**Handoff queue**
+
+1. Lấy `candidates[].id` (đã sort score giảm dần)  
+2. User có thể reorder/bớt  
+3. `POST /api/invitation-queue` với `inviteeIds` + `timeoutSeconds`
+
+### 6.2. `POST /api/matching/score`
+
+**Body**
+
+| Field | Type | Rule |
+|-------|------|------|
+| `candidateId` | MongoId | required |
+| `mode` | MatchingMode? | |
+| `preferredOccupations` | string[]? | |
+
+**`data`:** `{ requesterId, candidateId, mode, score, breakdown, candidate }`
+
+### 6.3. `GET /api/matching/preferences`
+
+**`data`**
+
+| Field | Type | Default (chưa lưu DB) |
+|-------|------|------------------------|
+| `userId` | string | requester |
+| `preferredModes` | MatchingMode[] | `[CASUAL]` |
+| `preferredAlcoholLevels` | string[] | `[]` |
+| `preferredOccupations` | string[] | `[]` |
+| `maxDistanceKm` | number\|null | `15` (chưa apply Phase 1) |
+| `maxCandidates` | number | `20` |
+| `excludeRecentDays` | number | `7` |
+
+### 6.4. `PUT /api/matching/preferences`
+
+**Body (partial):** các field prefs; nếu gửi `preferredModes` → **tối thiểu 1** phần tử (`ArrayMinSize(1)` + UC reject empty).
+
+---
+
+## 7. Module: Invitation Queue
+
+**File:** `src/modules/invitation-queue/presentation/http/invitation-queue.controller.ts`  
+**Base:** `/api/invitation-queue`  
+**Auth:** JWT  
+**Mounted:** Có  
+**Background:** BullMQ `invitation-timeout`
+
+### 7.0. State machine (tóm tắt)
+
+| Queue `status` | Ý nghĩa |
+|----------------|---------|
+| `active` | Đang mời tuần tự |
+| `matched` | Có accept |
+| `completed` | Hết list, không accept |
+| `cancelled` | Host hủy |
+| `draft` | Dự phòng (create hiện start `active`) |
+
+| Participant `status` | `pending` · `active` · `accepted` · `rejected` · `timeout` · `skipped` |
+| Invitation `status` | `pending` · `accepted` · `rejected` · `timeout` · `cancelled` |
+
+```text
+CREATE  → active, participants[0]=active, schedule timeout job
+ACCEPT  → matched, cancel job
+REJECT / TIMEOUT → advance next pending or completed/matched
+CANCEL  → cancelled; pending invites cancelled
 ```
 
-**Lỗi tiêu biểu**
+**Rules:** 1 active queue / host · invitees 1–20 · timeout 15–600s · respond chỉ current invitee · cancel/DELETE chỉ host.
 
-| HTTP | `error.code` |
-|------|----------------|
-| 400 | `VALIDATION_ERROR`, `INVALID_INVITEES` |
-| 404 | `USER_NOT_FOUND` (host) |
-| 409 | `ALREADY_HAS_ACTIVE_QUEUE` |
-| 429 | `RATE_LIMIT_EXCEEDED` |
-| 500 | `QUEUE_CREATE_FAILED` (invitations/BullMQ fail → queue rolled back) |
+### Thống kê
 
----
+| Method | Path | Rate limit | Ghi chú |
+|--------|------|------------|---------|
+| `POST` | `/api/invitation-queue` | 10/giờ | Create + start |
+| `GET` | `/api/invitation-queue/me` | — | Active queue host hoặc `null` |
+| `GET` | `/api/invitation-queue/history` | — | `?page&limit` (page≥1, limit 1–100; default page=1 limit=50 ở controller) |
+| `GET` | `/api/invitation-queue/candidates/suggestions` | — | Gợi ý text (không scoring Matching) |
+| `GET` | `/api/invitation-queue/candidates` | — | `?q=` search name/email/occupation |
+| `GET` | `/api/invitation-queue/invitations/:invitationId` | — | Flat invitation |
+| `GET` | `/api/invitation-queue/:queueId` | — | Host hoặc participant |
+| `POST` | `/api/invitation-queue/:queueId/respond` | 30/phút | `{ accept: boolean }` |
+| `POST` | `/api/invitation-queue/:queueId/cancel` | — | Host |
+| `DELETE` | `/api/invitation-queue/:queueId` | — | Host = cancel, **HTTP 204** |
 
-### 6.3. `GET /api/invitation-queue/me`
+> Route tĩnh (`me`, `history`, `candidates`, `invitations/...`) **trước** `:queueId`.
 
-| | |
-|--|--|
-| **Mô tả** | Lấy queue `active` mà user là **host** |
-| **Auth** | JWT |
-| **HTTP** | `200` |
-| **`data`** | `InvitationQueue` **hoặc** `null` |
+### 7.1. `POST /api/invitation-queue`
 
----
+**Body**
 
-### 6.4. `GET /api/invitation-queue/history`
+| Field | Type | Rule |
+|-------|------|------|
+| `title` | string? | max 120 |
+| `message` | string? | max 500 |
+| `timeoutSeconds` | int | **15–600** required |
+| `inviteeIds` | MongoId[] | 1–20, ordered priority |
 
-| | |
-|--|--|
-| **Mô tả** | Lịch sử invitation sent / received |
-| **Auth** | JWT |
-| **Query** | `page` (default 1), `limit` (default 50, max 100) |
+**`data`:** `InvitationQueue` response (xem 7.4).
 
-**Response `data`**
+### 7.2. Candidates (text search — không Matching score)
+
+**`GET /candidates?q=`** → `QueueUserRef[]`  
+**`GET /candidates/suggestions`** → tối đa ~6 user gần đây  
+
+```json
+{ "id", "name", "avatar?", "alcoholToleranceLevel?", "occupation?" }
+```
+
+### 7.3. Respond / Cancel
+
+**Respond body:** `{ "accept": true | false }`  
+**Cancel / DELETE:** không body; DELETE → 204.
+
+### 7.4. InvitationQueue response shape
+
+| Field | Type |
+|-------|------|
+| `id`, `hostId`, `hostName`, `hostAvatar?` | string |
+| `title?`, `message?` | string |
+| `status` | string |
+| `timeoutSeconds`, `currentIndex` | number |
+| `participants[]` | userId, name, avatar?, level?, occupation?, order, status, invitedAt?, respondedAt? |
+| `expiresAt`, `createdAt`, `updatedAt?`, `completedAt` | ISO string / null |
+
+Field nội bộ `generation` **không** expose.
+
+### 7.5. History response
 
 ```json
 {
-  "sent": [ /* Invitation[], direction=sent */ ],
-  "received": [ /* Invitation[], direction=received */ ],
+  "sent": [ /* InvitationResponseDto */ ],
+  "received": [ /* ... */ ],
   "meta": {
     "page": 1,
     "limit": 50,
-    "sentTotal": 12,
-    "receivedTotal": 3
+    "sentTotal": 0,
+    "receivedTotal": 0
   }
 }
 ```
 
-> FE cũ có thể bỏ qua `meta`. `sent` / `received` luôn có.
+---
+
+## 8. Module: Drinking Sessions (mock — **chưa mount**)
+
+**File:** `src/modules/drinking-sessions/drinking-sessions.controller.ts`  
+**Mounted:** **Không** trong `AppModule` → runtime: `Cannot GET/POST /api/drinking-sessions`
+
+| Method | Path | Auth code | Ghi chú |
+|--------|------|-----------|---------|
+| `POST` | `/api/drinking-sessions` | Swagger Bearer, **không Guard** | Mock return `{ success, data: { id: 'mock-id', ...dto, status: 'SCHEDULED' } }` |
+
+**Body (khi mount):** `title`, `location`, `maxParticipants` (1–20), `startTime` (ISO), `note?`
+
+**Không có** `GET /api/drinking-sessions` trong code (FE gọi sẽ 404 kể cả khi mount controller hiện tại).
 
 ---
 
-### 6.5. `GET /api/invitation-queue/candidates`
+## 9. Module / route FE gọi nhưng **chưa có backend**
 
-| | |
-|--|--|
-| **Mô tả** | Search user làm invitee (ẩn `hideProfile`, exclude self) |
-| **Auth** | JWT |
-| **Query** | `q` optional (name / email / occupation) |
-| **`data`** | `QueueUserRef[]` |
+Các request sau xuất hiện log `Cannot GET ...` khi FE home poll — **đúng với codebase hiện tại**:
 
----
+| Path FE | Backend |
+|---------|---------|
+| `GET /api/notifications/unread-count` | Folder `notifications/` trống, 0 endpoint |
+| `GET /api/chat/unread-count` | Folder `chat/` trống |
+| `GET /api/drinking-sessions` | Không có GET; module chưa mount |
+| `GET /api/friends` | Không có module |
+| `GET /api/monetization/ads?placement=...` | Không có module |
+| `safe-ride` | Folder trống |
 
-### 6.6. `GET /api/invitation-queue/candidates/suggestions`
-
-| | |
-|--|--|
-| **Mô tả** | Gợi ý candidates (limit ~6, không bắt buộc `q`) |
-| **Auth** | JWT |
-| **`data`** | `QueueUserRef[]` |
+**Khuyến nghị FE:** ignore/feature-flag 404. **Backend:** implement khi roadmap tới.
 
 ---
 
-### 6.7. `GET /api/invitation-queue/invitations/:invitationId`
-
-| | |
-|--|--|
-| **Mô tả** | Chi tiết flat invitation |
-| **Auth** | JWT — chỉ `fromUserId` hoặc `toUserId` |
-| **`data`** | `Invitation` (+ `direction`) |
-
-**Lỗi:** `404 INVITATION_NOT_FOUND`, `403 FORBIDDEN_QUEUE_ACCESS`
-
----
-
-### 6.8. `GET /api/invitation-queue/:queueId`
-
-| | |
-|--|--|
-| **Mô tả** | Chi tiết queue live |
-| **Auth** | JWT — host hoặc participant |
-| **`data`** | `InvitationQueue` |
-
-**Lỗi:** `404 QUEUE_NOT_FOUND`, `403 FORBIDDEN_QUEUE_ACCESS`
-
----
-
-### 6.9. `POST /api/invitation-queue/:queueId/respond`
-
-| | |
-|--|--|
-| **Mô tả** | Current invitee accept / reject |
-| **Auth** | JWT |
-| **Throttle** | 30 / phút / user |
-
-**Request body**
-
-| Field | Type | Required |
-|-------|------|----------|
-| `accept` | `boolean` | Có |
-
-```json
-{ "accept": true }
-```
-
-**Response `data`:** `InvitationQueue` sau transition  
-- `accept: true` → thường `status: "matched"`  
-- `accept: false` → advance sang pending tiếp theo hoặc `completed`
-
-**Lỗi:** `400 NOT_YOUR_TURN`, `409 QUEUE_NOT_ACTIVE`, `404 QUEUE_NOT_FOUND`, `429 RATE_LIMIT_EXCEEDED`
-
----
-
-### 6.10. `POST /api/invitation-queue/:queueId/cancel`
-
-| | |
-|--|--|
-| **Mô tả** | Host hủy queue đang active |
-| **Auth** | JWT (host) |
-| **`data`** | `InvitationQueue` với `status: "cancelled"` |
-
-**Lỗi:** `403 FORBIDDEN_QUEUE_ACCESS`, `409 QUEUE_NOT_ACTIVE`, `404 QUEUE_NOT_FOUND`
-
----
-
-### 6.11. `DELETE /api/invitation-queue/:queueId`
-
-| | |
-|--|--|
-| **Mô tả** | **Host only** — cùng semantics `POST .../cancel` |
-| **Auth** | JWT (host) |
-| **HTTP** | `204` — interceptor có thể trả `data: null` nếu client vẫn parse JSON body |
-| **Invitee** | `403 FORBIDDEN_QUEUE_ACCESS` — dùng `POST .../respond` `{ "accept": false }` |
-
----
-
-### 6.12. Bảng lỗi Invitation Queue
-
-| HTTP | `error.code` | Khi nào |
-|------|--------------|---------|
-| 400 | `VALIDATION_ERROR` | DTO fail |
-| 400 | `INVALID_INVITEES` | Empty / self / max / missing / hideProfile |
-| 400 | `NOT_YOUR_TURN` | Respond không phải current invitee |
-| 403 | `FORBIDDEN_QUEUE_ACCESS` | Cancel/DELETE non-host; get invitation/queue lạ |
-| 404 | `QUEUE_NOT_FOUND` | |
-| 404 | `INVITATION_NOT_FOUND` | |
-| 404 | `USER_NOT_FOUND` | Host missing khi create |
-| 409 | `ALREADY_HAS_ACTIVE_QUEUE` | Host đã có queue active |
-| 409 | `QUEUE_NOT_ACTIVE` | Race / queue đã terminal |
-| 429 | `RATE_LIMIT_EXCEEDED` | Create / respond throttle |
-| 500 | `QUEUE_CREATE_FAILED` | Post-create invitations hoặc schedule fail (đã compensate) |
-| 500 | `QUEUE_ERROR` | BullMQ lỗi khác (filter) |
-
----
-
-### 6.13. Ghi chú tích hợp FE (queue)
-
-1. Countdown UI dựa **`expiresAt` server** — client không tự POST timeout.  
-2. Poll detail / me khi active (vd. 2–3s) cho đến khi có Socket (Phase 2).  
-3. Tắt mock: `NEXT_PUBLIC_QUEUE_MOCK=false` khi backend sẵn sàng.  
-4. Paths client (Axios base đã gồm `/api` hoặc không): khớp prefix global `api`.  
-5. Redis **bắt buộc** khi create queue (BullMQ); Mongo + Redis down → create fail / 500.
-
----
-
-## 7. Module khác (chưa có endpoint)
-
-| Module folder | HTTP API |
-|---------------|----------|
-| `chat/` | Chưa |
-| `matchmaking/` | Chưa |
-| `notifications/` | Chưa |
-| `safe-ride/` | Chưa |
-
----
-
-## 8. Ma trận Auth nhanh
+## 10. Ma trận Auth nhanh
 
 | Endpoint | Public | JWT |
 |----------|--------|-----|
@@ -1146,42 +602,71 @@ CANCEL (host)   → cancelled; pending|active → skipped; pending invites → c
 | `GET/PATCH /api/users/me*` | | ✓ |
 | `GET /api/users/:id` | | ✓ |
 | `POST/GET /api/users/:id/reviews` | | ✓ |
+| `POST /api/matching/candidates` | | ✓ |
+| `POST /api/matching/score` | | ✓ |
+| `GET /api/matching/preferences` | | ✓ |
+| `PUT /api/matching/preferences` | | ✓ |
 | `POST /api/invitation-queue` | | ✓ |
 | `GET /api/invitation-queue/me` | | ✓ |
 | `GET /api/invitation-queue/history` | | ✓ |
-| `GET /api/invitation-queue/candidates` | | ✓ |
-| `GET /api/invitation-queue/candidates/suggestions` | | ✓ |
+| `GET /api/invitation-queue/candidates*` | | ✓ |
 | `GET /api/invitation-queue/invitations/:id` | | ✓ |
 | `GET /api/invitation-queue/:queueId` | | ✓ |
 | `POST /api/invitation-queue/:queueId/respond` | | ✓ |
 | `POST /api/invitation-queue/:queueId/cancel` | | ✓ |
 | `DELETE /api/invitation-queue/:queueId` | | ✓ |
-| `POST /api/drinking-sessions` | mock | (chưa guard, chưa mount) |
+| `POST /api/drinking-sessions` | mock | (chưa mount / chưa guard) |
 
 ---
 
-## 9. Ghi chú tích hợp Frontend
+## 11. Ghi chú tích hợp Frontend
 
-1. **Luôn đọc payload trong `response.data`** (success) và `response.error` (fail).  
-2. **Access token** gửi header `Authorization: Bearer ...`.  
-3. **Refresh** dùng body, không dùng cookie (hiện tại).  
-4. **Password register** tối thiểu **8** ký tự.  
-5. **Public profile** không có `email` / `privacySettings`.  
-6. **Google login** mặc định **501** — đừng coi là sẵn sàng production.  
-7. **Swagger:** `/api/docs` khi `ENABLE_SWAGGER` / development.  
-8. **Sessions API thật** chưa có; peer review `sessionId` hiện là string tự do.  
-9. **Invitation Queue Phase 1** đã mount — tắt FE mock khi test thật; poll `expiresAt` cho countdown.  
-10. **429** → `error.code = RATE_LIMIT_EXCEEDED` (create queue / respond).
+1. Với **`apiClient`**: success đã unwrap → nhận thẳng payload (không phải envelope). Lỗi: xem interceptor / typed error (`error.code`).  
+2. Access token: gắn tự động qua Axios interceptor (`Authorization: Bearer ...`).  
+3. Refresh dùng body + queue refresh trong `axiosInstance` (không cookie).  
+4. Password register tối thiểu **8** ký tự.  
+5. Public profile **không** có `email` / `privacySettings`.  
+6. Google login có thể **501**.  
+7. Swagger backend: `/api/docs` (dev) — tham chiếu shape.  
+8. Matching → Queue: `POST /matching/candidates` rồi `POST /invitation-queue` với `inviteeIds`.  
+9. Text search queue vẫn: `/invitation-queue/candidates?q=` (không score Matching).  
+10. Queue: poll `expiresAt` / detail; realtime Socket.io **chưa**.  
+11. Backend cần **Redis** cho create queue (BullMQ).  
+12. 429 → `RATE_LIMIT_EXCEEDED` — backoff / toast.  
+13. Các unread-count / friends / ads / GET sessions: **404 cho đến khi implement** — feature-flag hoặc ignore trên home.
 
 ---
 
-## 10. Lịch sử tài liệu
+## 12. Flow gợi ý (Matching + Queue)
+
+```text
+[Login] → JWT
+    ↓
+PUT/GET /matching/preferences   (optional)
+    ↓
+POST /matching/candidates       → ranked ids
+    ↓
+(user chọn / reorder)
+    ↓
+POST /invitation-queue          { inviteeIds, timeoutSeconds, title?, message? }
+    ↓
+poll GET /invitation-queue/me | GET /:queueId
+invitee: POST /:queueId/respond { accept }
+host: POST /:queueId/cancel | DELETE /:queueId
+```
+
+---
+
+## 13. Lịch sử tài liệu
 
 | Version | Ngày | Ghi chú |
 |---------|------|---------|
-| 1.0 | 2026-07-16 | Thống kê toàn bộ endpoint hiện có theo code; format success/error chuẩn Phase 1–2 |
-| 1.1 | 2026-07-16 | Mở rộng **Invitation Queue**: 10 endpoint chi tiết, shapes, state machine, rate limit, error codes, FE notes |
+| 1.0 | 2026-07-16 | Thống kê endpoint ban đầu |
+| 1.1 | 2026-07-16 | Invitation Queue chi tiết |
+| 1.2 | 2026-07-16 | Matching Phase 1 (4 endpoint) |
+| **2.0** | **2026-07-16** | **Full rescan code:** Matching (throttle, formula, fallback), Users/Auth/Peer shapes, FE 404 inventory, flow handoff, stats 29 serve / 30 defined |
+| **2.0 (FE mirror)** | **2026-07-16** | Copy sang `frontend/docs/API_ENDPOINTS.md` + ghi chú FSD/`apiClient` |
 
 ---
 
-*Tài liệu sinh từ source code LiquidNetwork backend. Khi thêm module/route mới, cập nhật file này cho đồng bộ với Swagger.*
+*Mirror của backend. Source of truth: `backend/docs/API_ENDPOINTS.md`. Khi backend đổi API: cập nhật backend → re-sync file này.*

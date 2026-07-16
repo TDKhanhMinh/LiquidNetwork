@@ -1,6 +1,17 @@
 {
   "title": "Đồng hành về nhà",
   "subtitle": "Về nhà an toàn sau buổi hẹn",
+  "ad": {
+    "badge": "Safe Ride",
+    "title": "Đừng lái xe khi đã uống",
+    "description": "Gọi xe an toàn chỉ với một chạm. Xem mức phạt nồng độ cồn ngay sau quảng cáo này.",
+    "item1": "Gọi nhanh Grab, Xanh SM, Gojek hoặc Bạn uống tôi lái",
+    "item2": "Tham khảo khung phạt Nghị định 100 trước khi về",
+    "item3": "Ưu tiên an toàn cho bạn và người thân",
+    "note": "Nội dung quảng cáo / nhắc nhở an toàn — bạn có thể bỏ qua bất cứ lúc nào.",
+    "skip": "Bỏ qua quảng cáo",
+    "countdown": "Tự đóng sau {{count}}s"
+  },
   "warning": {
     "title": "Cảnh báo an toàn",
     "description": "Luôn ưu tiên an toàn di chuyển sau các buổi tiệc. Hãy gọi xe hoặc nhờ người chở."

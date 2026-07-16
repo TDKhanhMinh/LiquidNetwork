@@ -58,16 +58,16 @@ export function SafeRideScreen() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 py-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+    <div className="page-shell gap-5 md:gap-6">
+      <header className="space-y-1 md:space-y-1.5">
+        <h1 className="page-title">{t("title")}</h1>
+        <p className="page-subtitle">{t("subtitle")}</p>
       </header>
 
       {/* Warning */}
       <section
         role="alert"
-        className="flex gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4"
+        className="flex gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 md:p-5"
       >
         <ShieldAlertIcon className="mt-0.5 size-6 shrink-0 text-destructive" />
         <div>
@@ -81,9 +81,11 @@ export function SafeRideScreen() {
       </section>
 
       {/* Quick ride */}
-      <section className="space-y-3">
+      <section className="space-y-3 md:space-y-3.5">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">{t("ride.title")}</h2>
+          <h2 className="text-sm font-semibold md:text-[0.9375rem]">
+            {t("ride.title")}
+          </h2>
           <Badge variant="secondary">
             {preferred === "xanh_sm"
               ? t("ride.xanhSm")
@@ -94,7 +96,7 @@ export function SafeRideScreen() {
                   : t("ride.grab")}
           </Badge>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 md:gap-3 lg:grid-cols-4">
           {PROVIDERS.map((p) => {
             const labelKey =
               p === "xanh_sm"
@@ -109,7 +111,7 @@ export function SafeRideScreen() {
                 type="button"
                 variant={isPreferred ? "default" : "outline"}
                 className={cn(
-                  "min-h-14 flex-col gap-1 rounded-xl",
+                  "min-h-14 flex-col gap-1 rounded-xl md:min-h-16",
                   isPreferred && "shadow-amber-glow",
                 )}
                 disabled={requestRide.isPending}
@@ -118,35 +120,39 @@ export function SafeRideScreen() {
                 {requestRide.isPending ? (
                   <Loader2Icon className="animate-spin" />
                 ) : (
-                  <CarIcon className="size-5" />
+                  <CarIcon className="size-5 md:size-6" />
                 )}
-                <span className="text-xs font-medium">
+                <span className="text-xs font-medium md:text-[0.8125rem]">
                   {t(`ride.${labelKey}`)}
                 </span>
               </Button>
             );
           })}
         </div>
-        <p className="text-xs text-muted-foreground">{t("ride.hint")}</p>
+        <p className="text-xs text-muted-foreground md:text-[0.8125rem]">
+          {t("ride.hint")}
+        </p>
       </section>
 
       {/* Decree 100 fines */}
-      <section className="space-y-3">
+      <section className="space-y-3 md:space-y-3.5">
         <div className="flex items-center gap-2">
           <AlertTriangleIcon className="size-4 text-warning" />
-          <h2 className="text-sm font-semibold">{t("fines.title")}</h2>
+          <h2 className="text-sm font-semibold md:text-[0.9375rem]">
+            {t("fines.title")}
+          </h2>
         </div>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground md:text-[0.8125rem]">
           {t("fines.description")}
         </p>
-        <p className="text-[11px] text-muted-foreground italic">
+        <p className="text-[11px] text-muted-foreground italic md:text-xs">
           {t("fines.disclaimer")}
         </p>
-        <ul className="space-y-2">
+        <ul className="grid grid-cols-1 gap-2 md:gap-3 lg:grid-cols-2">
           {(fines.data ?? []).map((band) => (
             <li
               key={band.id}
-              className="rounded-xl border border-border bg-card px-3 py-3 text-sm"
+              className="rounded-xl border border-border bg-card px-3 py-3 text-sm md:px-4 md:py-3.5 md:text-[0.9375rem]"
             >
               <div className="flex items-center justify-between gap-2">
                 <Badge variant="outline">{band.vehicle}</Badge>
@@ -154,21 +160,23 @@ export function SafeRideScreen() {
                   {band.fineRange}
                 </span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs text-muted-foreground md:text-[0.8125rem]">
                 {band.bloodAlcohol}
               </p>
-              <p className="mt-1 text-xs font-medium">{band.licenseAction}</p>
+              <p className="mt-1 text-xs font-medium md:text-[0.8125rem]">
+                {band.licenseAction}
+              </p>
             </li>
           ))}
         </ul>
       </section>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 md:gap-3">
         <Link
           href={routes.safeRideHistory}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "min-h-11 rounded-xl",
+            "min-h-11 rounded-xl md:min-h-12",
           )}
         >
           <HistoryIcon />
@@ -178,7 +186,7 @@ export function SafeRideScreen() {
           href={routes.safeRideSettings}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "min-h-11 rounded-xl",
+            "min-h-11 rounded-xl md:min-h-12",
           )}
         >
           <SettingsIcon />

@@ -32,22 +32,22 @@ export function PublicProfileScreen({ userId }: PublicProfileScreenProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
-      <header className="space-y-1">
-        <p className="text-xs font-medium tracking-wide text-primary uppercase">
+    <div className="page-shell gap-6 md:gap-7">
+      <header className="space-y-1 md:space-y-1.5">
+        <p className="text-xs font-medium tracking-wide text-primary uppercase md:text-[0.8125rem]">
           {t("profile.public")}
         </p>
-        <h1 className="text-2xl font-bold tracking-tight">{user.name}</h1>
+        <h1 className="page-title">{user.name}</h1>
       </header>
 
       <DrunkProfileCard user={user} isOwner={false} />
 
-      <div className="grid gap-2">
+      <div className="grid gap-2 md:gap-3">
         <Link
           href={`${routes.userReviews(userId)}?mode=write`}
           className={cn(
             buttonVariants({ variant: "default" }),
-            "min-h-11 rounded-xl",
+            "min-h-11 rounded-xl md:min-h-12",
           )}
         >
           {t("reviews.write")}
@@ -56,7 +56,7 @@ export function PublicProfileScreen({ userId }: PublicProfileScreenProps) {
           href={routes.profile}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "min-h-11 rounded-xl",
+            "min-h-11 rounded-xl md:min-h-12",
           )}
         >
           {t("common:actions.back")}

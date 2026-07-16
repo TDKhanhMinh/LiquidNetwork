@@ -80,7 +80,7 @@ export function WriteReviewForm({
         <h2 className="text-lg font-semibold">
           {t("reviews.writeTitle", { name: revieweeName || "…" })}
         </h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="page-subtitle">
           {t("reviews.writeSubtitle")}
         </p>
       </div>

@@ -49,17 +49,17 @@ export function DiscoverScreen() {
   if (!ready) return null;
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 px-4 py-6">
-      <header className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+    <div className="page-shell gap-4 md:gap-5">
+      <header className="flex items-start justify-between gap-3 md:gap-4">
+        <div className="space-y-1 md:space-y-1.5">
+          <h1 className="page-title">{t("title")}</h1>
+          <p className="page-subtitle">{t("subtitle")}</p>
         </div>
         <Button
           type="button"
           variant="outline"
           size="icon"
-          className="size-11 shrink-0 rounded-xl"
+          className="size-11 shrink-0 rounded-xl md:size-12"
           aria-expanded={showFilters}
           aria-label={t("filters.title")}
           onClick={() => setShowFilters((v) => !v)}
@@ -68,16 +68,16 @@ export function DiscoverScreen() {
         </Button>
       </header>
 
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold">{t("filters.mode")}</h2>
-        <div className="grid grid-cols-2 gap-2">
+      <section className="space-y-2 md:space-y-2.5">
+        <h2 className="page-section-title">{t("filters.mode")}</h2>
+        <div className="grid grid-cols-2 gap-2 md:gap-3 lg:max-w-xl">
           {MATCH_MODES.map((mode) => (
             <button
               key={mode}
               type="button"
               onClick={() => setFilters((f) => ({ ...f, mode }))}
               className={cn(
-                "min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-medium transition-colors",
+                "min-h-12 rounded-xl border px-3 py-2 text-left text-sm font-medium transition-colors md:min-h-[3.25rem] md:text-[0.9375rem] hover:border-primary/40",
                 filters.mode === mode
                   ? "border-primary bg-primary/15 text-primary shadow-amber-glow"
                   : "border-border bg-card text-foreground",
@@ -187,14 +187,14 @@ export function DiscoverScreen() {
           compact
         />
       ) : (
-        <ul className="space-y-2 pb-2">
+        <ul className="grid grid-cols-1 gap-2 pb-2 md:gap-3 lg:grid-cols-2">
           {items.map((c) => (
             <li key={c.id}>
               <Link
                 href={routes.userPublic(c.id)}
-                className="flex min-h-16 items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 transition-colors active:bg-muted"
+                className="flex min-h-16 items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 transition-colors hover:border-primary/30 hover:bg-muted/30 active:bg-muted md:min-h-[4.5rem] md:px-4"
               >
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/15 text-lg font-bold text-primary">
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/15 text-lg font-bold text-primary md:size-14">
                   {c.name.slice(0, 1)}
                 </span>
                 <div className="min-w-0 flex-1">

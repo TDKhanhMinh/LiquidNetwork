@@ -87,12 +87,12 @@ export function AccountSettingsScreen() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
+    <div className="page-shell gap-6 md:gap-7">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="page-title">
           {t("settings.title")}
         </h1>
-        <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
+        <p className="page-subtitle">{t("settings.subtitle")}</p>
       </header>
 
       {/* Security (read-only info for now) */}

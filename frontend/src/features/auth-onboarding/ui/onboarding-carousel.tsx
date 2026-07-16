@@ -54,29 +54,27 @@ export function OnboardingCarousel() {
   if (!ready) return null;
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="space-y-2 text-center">
-        <p className="text-xs font-medium tracking-wide text-primary uppercase">
+    <div className="flex w-full flex-col gap-6 md:gap-7">
+      <div className="space-y-2 text-center md:space-y-2.5">
+        <p className="text-xs font-medium tracking-wide text-primary uppercase md:text-[0.8125rem]">
           {t("common:tagline")}
         </p>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          {t("onboarding.title")}
-        </h1>
-        <p className="text-sm text-muted-foreground">{t("onboarding.subtitle")}</p>
+        <h1 className="page-title text-foreground">{t("onboarding.title")}</h1>
+        <p className="page-subtitle">{t("onboarding.subtitle")}</p>
       </div>
 
       <div
         key={step}
-        className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-6 py-10 text-center shadow-amber-glow ring-1 ring-primary/15"
+        className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-6 py-10 text-center shadow-amber-glow ring-1 ring-primary/15 md:gap-5 md:px-7 md:py-12"
       >
-        <span className="flex size-16 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-          <Icon className="size-8" aria-hidden />
+        <span className="flex size-16 items-center justify-center rounded-2xl bg-primary/15 text-primary md:size-[4.5rem]">
+          <Icon className="size-8 md:size-9" aria-hidden />
         </span>
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold tracking-tight">
+        <div className="space-y-2 md:space-y-2.5">
+          <h2 className="text-xl font-semibold tracking-tight md:text-[1.35rem]">
             {t(current.titleKey)}
           </h2>
-          <p className="max-w-sm text-[15px] leading-relaxed text-muted-foreground">
+          <p className="max-w-sm text-[15px] leading-relaxed text-muted-foreground md:text-base">
             {t(current.bodyKey)}
           </p>
         </div>

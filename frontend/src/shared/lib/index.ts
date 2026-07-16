@@ -15,6 +15,13 @@ export {
   setProfileSetupDone,
   clearOnboardingFlags,
 } from "./onboarding-storage";
+export {
+  interstitialSessionStorage,
+  isInterstitialSeen,
+  markInterstitialSeen,
+  clearInterstitialSeen,
+  SAFE_RIDE_INTERSTITIAL_SESSION_KEY,
+} from "./interstitial-session-storage";
 export { notifyAuthChanged, AUTH_CHANGED_EVENT } from "./auth-events";
 export { getPostAuthPath } from "./post-auth-path";
 export { normalizeVnPhone, isValidVnPhone } from "./phone";

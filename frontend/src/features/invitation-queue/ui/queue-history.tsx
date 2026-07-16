@@ -62,9 +62,9 @@ export function QueueHistory() {
   }));
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-6">
+    <div className="page-shell">
       <header className="mb-4 space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="page-title">
           {t("history.title")}
         </h1>
       </header>

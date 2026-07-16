@@ -70,13 +70,15 @@ export function RegisterForm({ className, embedded }: RegisterFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className={cn("flex flex-col gap-5", className)}
+      className={cn("flex flex-col gap-5 md:gap-6", className)}
       noValidate
     >
       {!embedded ? (
-        <div className="space-y-1">
-          <h2 className="text-lg font-semibold">{t("register.title")}</h2>
-          <p className="text-sm text-muted-foreground">
+        <div className="space-y-1.5">
+          <h2 className="text-lg font-semibold md:text-xl">
+            {t("register.title")}
+          </h2>
+          <p className="text-sm text-muted-foreground md:text-[0.9375rem]">
             {t("register.subtitle")}
           </p>
         </div>

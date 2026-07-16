@@ -1,8 +1,8 @@
 "use client";
 
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
 import resourcesToBackend from "i18next-resources-to-backend";
+import { initReactI18next } from "react-i18next";
 import {
   DEFAULT_LANGUAGE,
   DEFAULT_NS,
@@ -71,7 +71,7 @@ export function initI18n(): Promise<typeof i18n> {
         escapeValue: false,
       },
       react: {
-        useSuspense: false,
+        useSuspense: true,
       },
     })
     .then(() => {

@@ -2,15 +2,43 @@
 
 Next.js frontend for LiquidNetwork, structured with **[Feature-Sliced Design (FSD)](https://feature-sliced.design/)**.
 
-## Stack
+## 🛠 Tech Stack
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- shadcn/ui (`src/shared/ui`)
-- i18next + react-i18next (language-first locales, lazy namespaces)
-- Axios + TanStack Query (auto Bearer auth, refresh token, React Query cache)
+Dự án sử dụng các công nghệ hiện đại nhất, tối ưu cho hiệu năng và khả năng bảo trì:
+
+### 1. Core Framework & Environment
+
+- **Next.js 16.2** (Sử dụng App Router & Turbopack)
+- **React 19**
+- **TypeScript 5**
+- **Architecture**: [Feature-Sliced Design (FSD)](https://feature-sliced.design/)
+
+### 2. Styling & UI Components
+
+- **Tailwind CSS v4**: Utility-first CSS framework.
+- **shadcn/ui** & **Radix UI**: Headless UI components (`src/shared/ui`).
+- **@base-ui/react**: Nền tảng UI primitives.
+- **lucide-react**: Thư viện icon chuẩn mực.
+- **next-themes**: Quản lý Light/Dark mode.
+- **tw-animate-css** & **embla-carousel-react**: Hỗ trợ Animation và Carousel.
+
+### 3. State Management & Data Fetching
+
+- **@tanstack/react-query (v5)**: Quản lý server state, cache dữ liệu và xử lý loading/error states.
+- **Axios**: HTTP Client được cấu hình sẵn Interceptor để tự động xử lý Bearer Token, Refresh Token và bóc tách API Envelope.
+
+### 4. Internationalization (i18n)
+
+- **i18next** & **react-i18next**: Quản lý đa ngôn ngữ (mặc định: Tiếng Việt `vi`).
+- **i18next-resources-to-backend**: Lazy-load các file JSON theo từng namespace (`common`, `auth`, `error`...), tối ưu hóa bundle size kết hợp React Suspense để tránh Hydration Mismatch.
+
+### 5. Utilities & Helpers
+
+- **date-fns**: Xử lý và format thời gian.
+- **sonner**: Hiển thị Toast Notifications mượt mà.
+- **tailwind-merge** & **clsx**: Xử lý logic gộp dynamic CSS class an toàn.
+- **cmdk**: Xây dựng Command Menu (Ctrl+K).
+- **input-otp**: UI component chuyên dụng cho mã OTP.
 
 ## Project structure
 
@@ -29,6 +57,10 @@ src/
 Slices on the same layer do not import each other. Use each slice’s `index.ts` as the public API.
 
 See [AGENTS.md](./AGENTS.md) for agent/contributor conventions.
+
+### API contract (backend)
+
+Backend NestJS endpoints are documented in **[docs/API_ENDPOINTS.md](./docs/API_ENDPOINTS.md)** (mirror of `backend/docs/API_ENDPOINTS.md`, v2.0). Use it when wiring `entities/*/api` or features against Auth, Users, Matching, Invitation Queue.
 
 ## Getting started
 

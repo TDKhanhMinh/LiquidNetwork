@@ -37,9 +37,9 @@ export function InvitationDetail({ invitationId }: InvitationDetailProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 py-6">
+    <div className="page-shell gap-5 md:gap-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="page-title">
           {t("detail.title")}
         </h1>
         <Badge variant="outline">

@@ -66,7 +66,7 @@ export function PhoneLoginForm({
       {!compact ? (
         <div className="space-y-1">
           <h2 className="text-lg font-semibold">{t("phone.title")}</h2>
-          <p className="text-sm text-muted-foreground">{t("phone.subtitle")}</p>
+          <p className="page-subtitle">{t("phone.subtitle")}</p>
         </div>
       ) : null}
 

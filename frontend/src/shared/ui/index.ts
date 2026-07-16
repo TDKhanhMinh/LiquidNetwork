@@ -3,6 +3,7 @@
 export * from "./accordion";
 export * from "./alert";
 export * from "./alert-dialog";
+export * from "./app-frame";
 export * from "./aspect-ratio";
 export * from "./attachment";
 export * from "./avatar";
@@ -30,6 +31,7 @@ export * from "./hover-card";
 export * from "./input";
 export * from "./input-group";
 export * from "./input-otp";
+export * from "./interstitial-ad";
 export * from "./item";
 export * from "./kbd";
 export * from "./label";

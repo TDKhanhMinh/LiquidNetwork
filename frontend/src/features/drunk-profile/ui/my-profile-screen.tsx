@@ -68,20 +68,19 @@ export function MyProfileScreen({ footer }: MyProfileScreenProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
-      <header className="space-y-1">
-        <p className="text-xs font-medium tracking-wide text-primary uppercase">
+    <div className="page-shell gap-6 md:gap-7">
+      <header className="space-y-1 md:space-y-1.5">
+        <p className="text-xs font-medium tracking-wide text-primary uppercase md:text-[0.8125rem]">
           {t("profile.badge")}
         </p>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {t("profile.title")}
-        </h1>
-        <p className="text-sm text-muted-foreground">{t("profile.subtitle")}</p>
+        <h1 className="page-title">{t("profile.title")}</h1>
+        <p className="page-subtitle">{t("profile.subtitle")}</p>
       </header>
 
+      <div className="page-grid-2 items-start">
       <DrunkProfileCard user={user} isOwner />
 
-      <ul className="overflow-hidden rounded-2xl border border-border bg-card">
+      <ul className="overflow-hidden rounded-2xl border border-border bg-card md:shadow-sm lg:self-start">
         {LINKS.map((item, index) => {
           const Icon = item.icon;
           const label =
@@ -94,12 +93,14 @@ export function MyProfileScreen({ footer }: MyProfileScreenProps) {
                 href={item.href}
                 className={
                   index > 0
-                    ? "flex min-h-14 items-center gap-3 border-t border-border px-4 py-3 transition-colors active:bg-muted"
-                    : "flex min-h-14 items-center gap-3 px-4 py-3 transition-colors active:bg-muted"
+                    ? "flex min-h-14 items-center gap-3 border-t border-border px-4 py-3 transition-colors active:bg-muted md:min-h-[3.75rem] md:px-5 md:py-3.5"
+                    : "flex min-h-14 items-center gap-3 px-4 py-3 transition-colors active:bg-muted md:min-h-[3.75rem] md:px-5 md:py-3.5"
                 }
               >
                 <Icon className="size-5 text-primary" aria-hidden />
-                <span className="flex-1 text-sm font-medium">{label}</span>
+                <span className="flex-1 text-sm font-medium md:text-[0.9375rem]">
+                  {label}
+                </span>
                 <ChevronRightIcon
                   className="size-4 text-muted-foreground"
                   aria-hidden
@@ -109,6 +110,7 @@ export function MyProfileScreen({ footer }: MyProfileScreenProps) {
           );
         })}
       </ul>
+      </div>
 
       {footer}
     </div>

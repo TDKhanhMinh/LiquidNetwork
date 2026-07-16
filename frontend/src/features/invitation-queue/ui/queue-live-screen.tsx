@@ -82,11 +82,11 @@ export function QueueLiveScreen({ queueId }: QueueLiveScreenProps) {
     queue.status === "cancelled";
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
+    <div className="page-shell gap-6 md:gap-7">
       <header className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
+        <div className="space-y-1 md:space-y-1.5">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight">
+            <h1 className="text-xl font-bold tracking-tight md:text-2xl">
               {t("live.title")}
             </h1>
             {queue.status === "active" ? (
@@ -100,39 +100,39 @@ export function QueueLiveScreen({ queueId }: QueueLiveScreenProps) {
               </Badge>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="page-subtitle">
             {queue.title || t("live.defaultTitle")}
           </p>
         </div>
       </header>
 
       {/* Current invitee + countdown */}
-      <section className="rounded-2xl border border-border bg-card px-4 py-6 text-center shadow-amber-glow ring-1 ring-primary/10">
-        <p className="text-xs font-medium tracking-wide text-primary uppercase">
+      <section className="rounded-2xl border border-border bg-card px-4 py-6 text-center shadow-amber-glow ring-1 ring-primary/10 md:px-5 md:py-8">
+        <p className="text-xs font-medium tracking-wide text-primary uppercase md:text-[0.8125rem]">
           {t("live.currentInvitee")}
         </p>
-        <div className="mt-3 flex flex-col items-center gap-2">
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-primary/15 text-2xl font-bold text-primary">
+        <div className="mt-3 flex flex-col items-center gap-2 md:mt-4 md:gap-2.5">
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-primary/15 text-2xl font-bold text-primary md:size-[4.5rem] md:text-3xl">
             {(current?.name ?? "?").slice(0, 1)}
           </span>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold md:text-xl">
             {current?.name ?? t("live.noCurrent")}
           </h2>
           {queue.message ? (
-            <p className="max-w-xs text-sm text-muted-foreground">
+            <p className="max-w-xs text-sm text-muted-foreground md:text-[0.9375rem]">
               {queue.message}
             </p>
           ) : null}
         </div>
 
         {queue.status === "active" ? (
-          <div className="mt-6">
+          <div className="mt-6 md:mt-8">
             <CountdownRing
               progress={progress}
               label={isExpired ? "00:00" : label}
               caption={t("live.countdown")}
             />
-            <p className="mt-3 text-sm text-muted-foreground">
+            <p className="mt-3 text-sm text-muted-foreground md:text-[0.9375rem]">
               {isCurrentInvitee
                 ? t("live.youAreInvited")
                 : isHost
@@ -141,7 +141,7 @@ export function QueueLiveScreen({ queueId }: QueueLiveScreenProps) {
             </p>
           </div>
         ) : (
-          <p className="mt-6 text-sm font-medium text-foreground">
+          <p className="mt-6 text-sm font-medium text-foreground md:text-base">
             {queue.status === "matched"
               ? t("live.matched")
               : queue.status === "cancelled"
@@ -153,9 +153,9 @@ export function QueueLiveScreen({ queueId }: QueueLiveScreenProps) {
 
       {/* Actions */}
       {canRespond ? (
-        <div className="space-y-2">
+        <div className="space-y-2 md:space-y-3">
           {env.queueMock && isHost && !isCurrentInvitee ? (
-            <p className="text-center text-xs text-primary">
+            <p className="text-center text-xs text-primary md:text-sm">
               {t("live.demoRespondHint")}
             </p>
           ) : null}
@@ -163,7 +163,7 @@ export function QueueLiveScreen({ queueId }: QueueLiveScreenProps) {
             <Button
               type="button"
               variant="outline"
-              className="min-h-12 rounded-xl border-destructive/50 text-destructive"
+              className="min-h-12 rounded-xl border-destructive/50 text-destructive md:min-h-[3.25rem]"
               disabled={respond.isPending}
               onClick={() =>
                 respond.mutate({ queueId: queue.id, accept: false })

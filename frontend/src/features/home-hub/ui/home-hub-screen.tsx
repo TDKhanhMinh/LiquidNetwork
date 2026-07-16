@@ -60,15 +60,15 @@ export function HomeHubScreen() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4 py-16 text-center">
-        <div className="space-y-3">
-          <p className="text-sm font-medium tracking-wide text-primary uppercase">
+      <div className="page-shell flex-1 items-center justify-center gap-6 py-16 text-center md:py-20">
+        <div className="space-y-3 md:space-y-4">
+          <p className="text-sm font-medium tracking-wide text-primary uppercase md:text-[0.9375rem]">
             {t("tagline")}
           </p>
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
             {t("appName")}
           </h1>
-          <p className="mx-auto max-w-md text-base text-muted-foreground">
+          <p className="mx-auto max-w-md text-base text-muted-foreground md:text-[1.05rem]">
             {t("home.subtitle")}
           </p>
         </div>
@@ -104,20 +104,18 @@ export function HomeHubScreen() {
   const promo = ads.data ?? [];
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
-      <header className="space-y-3">
-        <div className="space-y-1">
-          <p className="text-xs font-medium tracking-wide text-primary uppercase">
+    <div className="page-shell gap-6 md:gap-7">
+      <header className="space-y-3 md:space-y-4">
+        <div className="space-y-1 md:space-y-1.5">
+          <p className="text-xs font-medium tracking-wide text-primary uppercase md:text-[0.8125rem]">
             {t("tagline")}
           </p>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {t("home.welcome")}
-          </h1>
-          <p className="text-sm text-muted-foreground">{t("home.subtitle")}</p>
+          <h1 className="page-title">{t("home.welcome")}</h1>
+          <p className="page-subtitle">{t("home.subtitle")}</p>
         </div>
         <Link
           href={routes.search}
-          className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors active:bg-muted"
+          className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors active:bg-muted md:min-h-12 md:px-4 md:text-[0.9375rem]"
         >
           <SearchIcon className="size-4" />
           {t("home.searchPlaceholder")}
@@ -127,7 +125,7 @@ export function HomeHubScreen() {
       {activeQueue ? (
         <Link
           href={routes.queueLive(activeQueue.id)}
-          className="block rounded-2xl border border-primary/40 bg-primary/10 p-4 shadow-amber-glow ring-1 ring-primary/20"
+          className="block rounded-2xl border border-primary/40 bg-primary/10 p-4 shadow-amber-glow ring-1 ring-primary/20 md:p-5"
         >
           <div className="flex items-center justify-between gap-2">
             <Badge className="gap-1">{t("home.activeQueue")}</Badge>
@@ -160,9 +158,9 @@ export function HomeHubScreen() {
         </section>
       ) : null}
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold">{t("home.quickActions")}</h2>
-        <div className="grid grid-cols-2 gap-2">
+      <section className="space-y-3 md:space-y-4">
+        <h2 className="page-section-title">{t("home.quickActions")}</h2>
+        <div className="page-grid-4">
           {(
             [
               {
@@ -218,17 +216,17 @@ export function HomeHubScreen() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex min-h-16 items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 active:bg-muted"
+              className="flex min-h-16 items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 transition-colors hover:border-primary/30 hover:bg-muted/40 active:bg-muted md:min-h-[4.5rem] md:px-4 lg:flex-col lg:items-start lg:justify-center lg:gap-2 lg:py-4"
             >
               <span
                 className={cn(
-                  "flex size-10 items-center justify-center rounded-xl",
+                  "flex size-10 items-center justify-center rounded-xl md:size-11",
                   item.tone,
                 )}
               >
                 <item.icon className="size-5" />
               </span>
-              <span className="text-sm font-medium leading-tight">
+              <span className="text-sm font-medium leading-tight md:text-[0.9375rem]">
                 {item.label}
               </span>
             </Link>
@@ -236,9 +234,10 @@ export function HomeHubScreen() {
         </div>
       </section>
 
-      <section className="space-y-2">
+      <div className="page-grid-2">
+      <section className="space-y-2 md:space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">{t("home.upcomingSessions")}</h2>
+          <h2 className="page-section-title">{t("home.upcomingSessions")}</h2>
           <Link
             href={routes.sessions}
             className="text-xs font-medium text-primary"
@@ -272,33 +271,34 @@ export function HomeHubScreen() {
         )}
       </section>
 
-      <section className="space-y-2">
+      <section className="space-y-2 md:space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">{t("home.drinkingBuddies")}</h2>
+          <h2 className="page-section-title">{t("home.drinkingBuddies")}</h2>
           <Link
             href={routes.friends}
-            className="text-xs font-medium text-primary"
+            className="text-xs font-medium text-primary md:text-sm"
           >
             {t("actions.viewAll")}
           </Link>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 md:gap-3">
           {buddyPreview.map((f) => (
             <Link
               key={f.id}
               href={routes.userPublic(f.id)}
-              className="flex min-w-[72px] flex-col items-center gap-1 rounded-xl px-1 py-2"
+              className="flex min-w-[72px] flex-col items-center gap-1 rounded-xl px-1 py-2 md:min-w-[88px]"
             >
-              <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/15 text-sm font-bold text-primary">
+              <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/15 text-sm font-bold text-primary md:size-14 md:text-base">
                 {f.name.slice(0, 1)}
               </span>
-              <span className="max-w-[72px] truncate text-[11px] font-medium">
+              <span className="max-w-[72px] truncate text-[11px] font-medium md:max-w-[88px] md:text-xs">
                 {f.name.split(" ")[0]}
               </span>
             </Link>
           ))}
         </div>
       </section>
+      </div>
     </div>
   );
 }

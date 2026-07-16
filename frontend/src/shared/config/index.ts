@@ -8,3 +8,9 @@ export {
   isAuthFlowPath,
   isMainProtectedPath,
 } from "./routes";
+export {
+  MAIN_TABS,
+  isTabActive,
+  type MainTab,
+  type MainTabId,
+} from "./main-nav";
