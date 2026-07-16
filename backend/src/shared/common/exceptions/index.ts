@@ -8,3 +8,4 @@ export * from './bad-request.exception';
 export * from './queue.exception';
 export * from './database.exception';
 export * from './external-service.exception';
+export * from './too-many-requests.exception';

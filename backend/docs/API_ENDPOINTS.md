@@ -1,6 +1,6 @@
 # LiquidNetwork Backend — Thống kê & mô tả Request / Response
 
-> **Phiên bản tài liệu:** 1.0  
+> **Phiên bản tài liệu:** 1.1  
 > **Nguồn:** code tại `src/` (controllers, DTOs, interceptors, filters)  
 > **Base URL:** `http://localhost:{PORT}/api` (mặc định `PORT=3000`)  
 > **Swagger (dev):** `http://localhost:{PORT}/api/docs`
@@ -17,11 +17,12 @@
 | **Auth** | `/auth` | 6 | Có | 2/6 (logout, me) |
 | **Users** | `/users` | 6 | Có | Tất cả |
 | **Peer Reviews** (trong UsersModule) | `/users/:id/reviews` | 2 | Có | Tất cả |
+| **Invitation Queue** | `/invitation-queue` | 10 | Có | Tất cả |
 | **Drinking Sessions** | `/drinking-sessions` | 1 | **Không** (mock, chưa import) | Swagger ghi Bearer nhưng **chưa gắn Guard** |
-| Chat / Matchmaking / Notifications / Safe-ride / Invitation-queue | — | 0 | Chưa có HTTP | — |
+| Chat / Matchmaking / Notifications / Safe-ride | — | 0 | Chưa có HTTP | — |
 
-**Tổng endpoint đã định nghĩa trong code:** **16**  
-**Tổng endpoint đang serve khi app chạy:** **15** (trừ `POST /drinking-sessions` vì module chưa mount)
+**Tổng endpoint đã định nghĩa trong code:** **26**  
+**Tổng endpoint đang serve khi app chạy:** **25** (trừ `POST /drinking-sessions` vì module chưa mount)
 
 ### 1.2. Convention chung
 
@@ -90,12 +91,15 @@ Mọi handler **success** được bọc:
 |------|--------------|---------|
 | 400 | `VALIDATION_ERROR` | Body/query sai class-validator |
 | 400 | `INVALID_DATA_TYPE` | Mongo `CastError` (vd. id sai) |
+| 400 | `INVALID_INVITEES` / `NOT_YOUR_TURN` | Queue invitee list / không đúng lượt |
 | 401 | `UNAUTHORIZED` / `INVALID_CREDENTIALS` / `INVALID_TOKEN` / `USER_NOT_FOUND` | Auth / JWT |
 | 401 | `INVALID_REFRESH_TOKEN` / `REFRESH_TOKEN_EXPIRED` / `TOKEN_REUSE_DETECTED` | Refresh |
-| 404 | `USER_NOT_FOUND` / `NOT_FOUND` | User ẩn / không tồn tại |
-| 409 | `EMAIL_ALREADY_EXISTS` / `CONFLICT` | Email trùng, self-review, duplicate review |
+| 403 | `FORBIDDEN_QUEUE_ACCESS` | Không phải host/participant / host-only action |
+| 404 | `USER_NOT_FOUND` / `NOT_FOUND` / `QUEUE_NOT_FOUND` / `INVITATION_NOT_FOUND` | Resource không tồn tại / ẩn |
+| 409 | `EMAIL_ALREADY_EXISTS` / `CONFLICT` / `ALREADY_HAS_ACTIVE_QUEUE` / `QUEUE_NOT_ACTIVE` | Conflict nghiệp vụ |
+| 429 | `RATE_LIMIT_EXCEEDED` | Throttle create/respond queue (và global) |
 | 501 | `GOOGLE_AUTH_DISABLED` | Google login tắt |
-| 500 | `INTERNAL_SERVER_ERROR` / `REGISTRATION_FAILED` | Lỗi hệ thống |
+| 500 | `INTERNAL_SERVER_ERROR` / `REGISTRATION_FAILED` / `QUEUE_CREATE_FAILED` / `QUEUE_ERROR` | Lỗi hệ thống / BullMQ |
 
 ---
 
@@ -733,7 +737,391 @@ Authorization: Bearer <accessToken>
 
 ---
 
-## 6. Module khác (chưa có endpoint)
+## 6. Module: Invitation Queue
+
+**File:** `src/modules/invitation-queue/presentation/http/invitation-queue.controller.ts`  
+**Base path:** `/api/invitation-queue`  
+**Mounted:** Có (`InvitationQueueModule`)  
+**Auth:** JWT bắt buộc trên **toàn controller**  
+**Background:** BullMQ queue name `invitation-timeout` (timeout per invitee → auto advance)
+
+### 6.0. Domain & state machine (tóm tắt)
+
+**Sequential Invite Queue:** host mời theo thứ tự ưu tiên; mỗi lượt có cửa sổ `timeoutSeconds`; reject/timeout → advance; accept → `matched` và dừng.
+
+| Queue `status` | Ý nghĩa |
+|----------------|---------|
+| `draft` | Dự phòng (create hiện tại start thẳng `active`) |
+| `active` | Đang mời tuần tự |
+| `matched` | Có ít nhất 1 accept (thường dừng ngay khi accept) |
+| `completed` | Hết list, không ai accept |
+| `cancelled` | Host hủy |
+
+| Participant `status` | Ý nghĩa |
+|----------------------|---------|
+| `pending` | Chưa tới lượt |
+| `active` | Đang là head / current invitee |
+| `accepted` | Đồng ý |
+| `rejected` | Từ chối |
+| `timeout` | Hết giờ không trả lời |
+| `skipped` | Bị bỏ khi queue cancel |
+
+| Invitation `status` (flat history) | Ý nghĩa |
+|------------------------------------|---------|
+| `pending` \| `accepted` \| `rejected` \| `timeout` \| `cancelled` | Bản ghi lịch sử 1-1 host→invitee |
+
+**Chuyển trạng thái chính**
+
+```text
+CREATE  → status=active, participants[0]=active, schedule BullMQ delay=timeoutSeconds
+RESPOND accept  → p[i]=accepted, queue=matched, cancel job
+RESPOND reject  → p[i]=rejected → ADVANCE
+TIMEOUT (job)   → p[i]=timeout → ADVANCE  (idempotent via generation)
+ADVANCE         → next pending = active + new expiresAt + job
+                → no pending → matched (if any accepted) else completed
+CANCEL (host)   → cancelled; pending|active → skipped; pending invites → cancelled
+```
+
+**Quy tắc**
+
+| Rule | Chi tiết |
+|------|----------|
+| Host | 1 queue `active` tại một thời điểm |
+| Invitees | ≥1, ≤20, MongoId, unique, ≠ host, user tồn tại, không `hideProfile` |
+| `timeoutSeconds` | 15–600 (giây) |
+| Respond | Chỉ user = current invitee (`participants[currentIndex]`, status `active`) |
+| Cancel / DELETE | Chỉ host |
+| Get by id | Host **hoặc** participant |
+| Realtime | Chưa Socket.io — FE poll `expiresAt` / detail |
+
+### Thống kê Invitation Queue
+
+| Method | Path | Auth | Rate limit | Ghi chú |
+|--------|------|------|------------|---------|
+| `POST` | `/api/invitation-queue` | JWT | **10 / giờ / user** | Tạo + start #1 |
+| `GET` | `/api/invitation-queue/me` | JWT | — | Active queue của **host** hoặc `null` |
+| `GET` | `/api/invitation-queue/history` | JWT | — | `?page&limit` optional |
+| `GET` | `/api/invitation-queue/candidates` | JWT | — | `?q=` search |
+| `GET` | `/api/invitation-queue/candidates/suggestions` | JWT | — | Gợi ý ngắn |
+| `GET` | `/api/invitation-queue/invitations/:invitationId` | JWT | — | Flat invitation |
+| `GET` | `/api/invitation-queue/:queueId` | JWT | — | Host hoặc participant |
+| `POST` | `/api/invitation-queue/:queueId/respond` | JWT | **30 / phút / user** | Current invitee only |
+| `POST` | `/api/invitation-queue/:queueId/cancel` | JWT | — | Host only |
+| `DELETE` | `/api/invitation-queue/:queueId` | JWT | — | Host only (= cancel), HTTP **204** body null |
+
+> **Thứ tự route:** static (`me`, `history`, `candidates`, `invitations/...`) **trước** `:queueId`.
+
+---
+
+### 6.1. Shared shapes
+
+#### `InvitationQueue` (`data`)
+
+| Field | Type | Mô tả |
+|-------|------|--------|
+| `id` | `string` | Queue id |
+| `hostId` | `string` | |
+| `hostName` | `string` | Snapshot lúc create |
+| `hostAvatar` | `string?` | |
+| `title` | `string?` | |
+| `message` | `string?` | |
+| `status` | `string` | Xem bảng status |
+| `timeoutSeconds` | `number` | Cửa sổ mỗi lượt |
+| `currentIndex` | `number` | Index participant đang active |
+| `participants` | `QueueParticipant[]` | Ordered |
+| `expiresAt` | `string \| null` | ISO hết hạn lượt hiện tại |
+| `createdAt` | `string` | ISO |
+| `updatedAt` | `string?` | ISO |
+| `completedAt` | `string \| null` | ISO khi terminal |
+
+> Field nội bộ `generation` **không** expose ra client.
+
+#### `QueueParticipant`
+
+| Field | Type |
+|-------|------|
+| `userId` | `string` |
+| `name` | `string` |
+| `avatar` | `string?` |
+| `alcoholToleranceLevel` | `string?` |
+| `occupation` | `string?` |
+| `order` | `number` |
+| `status` | `string` |
+| `invitedAt` | `string \| null` |
+| `respondedAt` | `string \| null` |
+
+#### `Invitation` (flat)
+
+| Field | Type |
+|-------|------|
+| `id` | `string` |
+| `queueId` | `string` |
+| `fromUserId` / `fromUserName` / `fromUserAvatar?` | |
+| `toUserId` / `toUserName` / `toUserAvatar?` | |
+| `status` | `string` |
+| `message` | `string?` |
+| `timeoutSeconds` | `number` |
+| `expiresAt` | `string \| null` |
+| `createdAt` | `string` |
+| `respondedAt` | `string \| null` |
+| `direction` | `"sent" \| "received"?` | Gán theo requester |
+
+#### `QueueUserRef` (candidates)
+
+| Field | Type |
+|-------|------|
+| `id` | `string` |
+| `name` | `string` |
+| `avatar` | `string?` |
+| `alcoholToleranceLevel` | `string?` |
+| `occupation` | `string?` |
+
+---
+
+### 6.2. `POST /api/invitation-queue`
+
+| | |
+|--|--|
+| **Mô tả** | Tạo queue, kích hoạt invitee #1, schedule BullMQ timeout |
+| **Auth** | JWT (host = current user) |
+| **HTTP** | `201` (Nest default POST) / `200` tùy version — client nên chấp nhận 2xx |
+| **Throttle** | 10 requests / 3600s / user |
+
+**Request body**
+
+| Field | Type | Required | Validation |
+|-------|------|----------|------------|
+| `title` | `string` | Không | max 120 |
+| `message` | `string` | Không | max 500 |
+| `timeoutSeconds` | `number` | Có | int 15–600 |
+| `inviteeIds` | `string[]` | Có | min 1, max 20, mỗi phần tử MongoId |
+
+```json
+{
+  "title": "Tối nay bàn Sài Gòn",
+  "message": "Ai rảnh đi 1–2 tiếng không?",
+  "timeoutSeconds": 60,
+  "inviteeIds": [
+    "664f1a2b3c4d5e6f7a8b9c0d",
+    "664f1a2b3c4d5e6f7a8b9c0e"
+  ]
+}
+```
+
+**Response `data`:** `InvitationQueue` (status `active`, `currentIndex` = 0, participant[0] `active`).
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "664fabc...",
+    "hostId": "664fhost...",
+    "hostName": "Minh",
+    "title": "Tối nay bàn Sài Gòn",
+    "message": "Ai rảnh đi 1–2 tiếng không?",
+    "status": "active",
+    "timeoutSeconds": 60,
+    "currentIndex": 0,
+    "participants": [
+      {
+        "userId": "664f1a2b3c4d5e6f7a8b9c0d",
+        "name": "Lan",
+        "order": 0,
+        "status": "active",
+        "invitedAt": "2026-07-16T10:00:00.000Z",
+        "respondedAt": null
+      },
+      {
+        "userId": "664f1a2b3c4d5e6f7a8b9c0e",
+        "name": "Huy",
+        "order": 1,
+        "status": "pending",
+        "invitedAt": null,
+        "respondedAt": null
+      }
+    ],
+    "expiresAt": "2026-07-16T10:01:00.000Z",
+    "createdAt": "2026-07-16T10:00:00.000Z",
+    "completedAt": null
+  },
+  "timestamp": "2026-07-16T10:00:00.000Z"
+}
+```
+
+**Lỗi tiêu biểu**
+
+| HTTP | `error.code` |
+|------|----------------|
+| 400 | `VALIDATION_ERROR`, `INVALID_INVITEES` |
+| 404 | `USER_NOT_FOUND` (host) |
+| 409 | `ALREADY_HAS_ACTIVE_QUEUE` |
+| 429 | `RATE_LIMIT_EXCEEDED` |
+| 500 | `QUEUE_CREATE_FAILED` (invitations/BullMQ fail → queue rolled back) |
+
+---
+
+### 6.3. `GET /api/invitation-queue/me`
+
+| | |
+|--|--|
+| **Mô tả** | Lấy queue `active` mà user là **host** |
+| **Auth** | JWT |
+| **HTTP** | `200` |
+| **`data`** | `InvitationQueue` **hoặc** `null` |
+
+---
+
+### 6.4. `GET /api/invitation-queue/history`
+
+| | |
+|--|--|
+| **Mô tả** | Lịch sử invitation sent / received |
+| **Auth** | JWT |
+| **Query** | `page` (default 1), `limit` (default 50, max 100) |
+
+**Response `data`**
+
+```json
+{
+  "sent": [ /* Invitation[], direction=sent */ ],
+  "received": [ /* Invitation[], direction=received */ ],
+  "meta": {
+    "page": 1,
+    "limit": 50,
+    "sentTotal": 12,
+    "receivedTotal": 3
+  }
+}
+```
+
+> FE cũ có thể bỏ qua `meta`. `sent` / `received` luôn có.
+
+---
+
+### 6.5. `GET /api/invitation-queue/candidates`
+
+| | |
+|--|--|
+| **Mô tả** | Search user làm invitee (ẩn `hideProfile`, exclude self) |
+| **Auth** | JWT |
+| **Query** | `q` optional (name / email / occupation) |
+| **`data`** | `QueueUserRef[]` |
+
+---
+
+### 6.6. `GET /api/invitation-queue/candidates/suggestions`
+
+| | |
+|--|--|
+| **Mô tả** | Gợi ý candidates (limit ~6, không bắt buộc `q`) |
+| **Auth** | JWT |
+| **`data`** | `QueueUserRef[]` |
+
+---
+
+### 6.7. `GET /api/invitation-queue/invitations/:invitationId`
+
+| | |
+|--|--|
+| **Mô tả** | Chi tiết flat invitation |
+| **Auth** | JWT — chỉ `fromUserId` hoặc `toUserId` |
+| **`data`** | `Invitation` (+ `direction`) |
+
+**Lỗi:** `404 INVITATION_NOT_FOUND`, `403 FORBIDDEN_QUEUE_ACCESS`
+
+---
+
+### 6.8. `GET /api/invitation-queue/:queueId`
+
+| | |
+|--|--|
+| **Mô tả** | Chi tiết queue live |
+| **Auth** | JWT — host hoặc participant |
+| **`data`** | `InvitationQueue` |
+
+**Lỗi:** `404 QUEUE_NOT_FOUND`, `403 FORBIDDEN_QUEUE_ACCESS`
+
+---
+
+### 6.9. `POST /api/invitation-queue/:queueId/respond`
+
+| | |
+|--|--|
+| **Mô tả** | Current invitee accept / reject |
+| **Auth** | JWT |
+| **Throttle** | 30 / phút / user |
+
+**Request body**
+
+| Field | Type | Required |
+|-------|------|----------|
+| `accept` | `boolean` | Có |
+
+```json
+{ "accept": true }
+```
+
+**Response `data`:** `InvitationQueue` sau transition  
+- `accept: true` → thường `status: "matched"`  
+- `accept: false` → advance sang pending tiếp theo hoặc `completed`
+
+**Lỗi:** `400 NOT_YOUR_TURN`, `409 QUEUE_NOT_ACTIVE`, `404 QUEUE_NOT_FOUND`, `429 RATE_LIMIT_EXCEEDED`
+
+---
+
+### 6.10. `POST /api/invitation-queue/:queueId/cancel`
+
+| | |
+|--|--|
+| **Mô tả** | Host hủy queue đang active |
+| **Auth** | JWT (host) |
+| **`data`** | `InvitationQueue` với `status: "cancelled"` |
+
+**Lỗi:** `403 FORBIDDEN_QUEUE_ACCESS`, `409 QUEUE_NOT_ACTIVE`, `404 QUEUE_NOT_FOUND`
+
+---
+
+### 6.11. `DELETE /api/invitation-queue/:queueId`
+
+| | |
+|--|--|
+| **Mô tả** | **Host only** — cùng semantics `POST .../cancel` |
+| **Auth** | JWT (host) |
+| **HTTP** | `204` — interceptor có thể trả `data: null` nếu client vẫn parse JSON body |
+| **Invitee** | `403 FORBIDDEN_QUEUE_ACCESS` — dùng `POST .../respond` `{ "accept": false }` |
+
+---
+
+### 6.12. Bảng lỗi Invitation Queue
+
+| HTTP | `error.code` | Khi nào |
+|------|--------------|---------|
+| 400 | `VALIDATION_ERROR` | DTO fail |
+| 400 | `INVALID_INVITEES` | Empty / self / max / missing / hideProfile |
+| 400 | `NOT_YOUR_TURN` | Respond không phải current invitee |
+| 403 | `FORBIDDEN_QUEUE_ACCESS` | Cancel/DELETE non-host; get invitation/queue lạ |
+| 404 | `QUEUE_NOT_FOUND` | |
+| 404 | `INVITATION_NOT_FOUND` | |
+| 404 | `USER_NOT_FOUND` | Host missing khi create |
+| 409 | `ALREADY_HAS_ACTIVE_QUEUE` | Host đã có queue active |
+| 409 | `QUEUE_NOT_ACTIVE` | Race / queue đã terminal |
+| 429 | `RATE_LIMIT_EXCEEDED` | Create / respond throttle |
+| 500 | `QUEUE_CREATE_FAILED` | Post-create invitations hoặc schedule fail (đã compensate) |
+| 500 | `QUEUE_ERROR` | BullMQ lỗi khác (filter) |
+
+---
+
+### 6.13. Ghi chú tích hợp FE (queue)
+
+1. Countdown UI dựa **`expiresAt` server** — client không tự POST timeout.  
+2. Poll detail / me khi active (vd. 2–3s) cho đến khi có Socket (Phase 2).  
+3. Tắt mock: `NEXT_PUBLIC_QUEUE_MOCK=false` khi backend sẵn sàng.  
+4. Paths client (Axios base đã gồm `/api` hoặc không): khớp prefix global `api`.  
+5. Redis **bắt buộc** khi create queue (BullMQ); Mongo + Redis down → create fail / 500.
+
+---
+
+## 7. Module khác (chưa có endpoint)
 
 | Module folder | HTTP API |
 |---------------|----------|
@@ -741,11 +1129,10 @@ Authorization: Bearer <accessToken>
 | `matchmaking/` | Chưa |
 | `notifications/` | Chưa |
 | `safe-ride/` | Chưa |
-| `invitation-queue/` | Chưa |
 
 ---
 
-## 7. Ma trận Auth nhanh
+## 8. Ma trận Auth nhanh
 
 | Endpoint | Public | JWT |
 |----------|--------|-----|
@@ -759,11 +1146,21 @@ Authorization: Bearer <accessToken>
 | `GET/PATCH /api/users/me*` | | ✓ |
 | `GET /api/users/:id` | | ✓ |
 | `POST/GET /api/users/:id/reviews` | | ✓ |
+| `POST /api/invitation-queue` | | ✓ |
+| `GET /api/invitation-queue/me` | | ✓ |
+| `GET /api/invitation-queue/history` | | ✓ |
+| `GET /api/invitation-queue/candidates` | | ✓ |
+| `GET /api/invitation-queue/candidates/suggestions` | | ✓ |
+| `GET /api/invitation-queue/invitations/:id` | | ✓ |
+| `GET /api/invitation-queue/:queueId` | | ✓ |
+| `POST /api/invitation-queue/:queueId/respond` | | ✓ |
+| `POST /api/invitation-queue/:queueId/cancel` | | ✓ |
+| `DELETE /api/invitation-queue/:queueId` | | ✓ |
 | `POST /api/drinking-sessions` | mock | (chưa guard, chưa mount) |
 
 ---
 
-## 8. Ghi chú tích hợp Frontend
+## 9. Ghi chú tích hợp Frontend
 
 1. **Luôn đọc payload trong `response.data`** (success) và `response.error` (fail).  
 2. **Access token** gửi header `Authorization: Bearer ...`.  
@@ -772,15 +1169,18 @@ Authorization: Bearer <accessToken>
 5. **Public profile** không có `email` / `privacySettings`.  
 6. **Google login** mặc định **501** — đừng coi là sẵn sàng production.  
 7. **Swagger:** `/api/docs` khi `ENABLE_SWAGGER` / development.  
-8. **Sessions API thật** chưa có; peer review `sessionId` hiện là string tự do.
+8. **Sessions API thật** chưa có; peer review `sessionId` hiện là string tự do.  
+9. **Invitation Queue Phase 1** đã mount — tắt FE mock khi test thật; poll `expiresAt` cho countdown.  
+10. **429** → `error.code = RATE_LIMIT_EXCEEDED` (create queue / respond).
 
 ---
 
-## 9. Lịch sử tài liệu
+## 10. Lịch sử tài liệu
 
 | Version | Ngày | Ghi chú |
 |---------|------|---------|
 | 1.0 | 2026-07-16 | Thống kê toàn bộ endpoint hiện có theo code; format success/error chuẩn Phase 1–2 |
+| 1.1 | 2026-07-16 | Mở rộng **Invitation Queue**: 10 endpoint chi tiết, shapes, state machine, rate limit, error codes, FE notes |
 
 ---
 
